@@ -49,10 +49,10 @@ class MainTest {
         game.InitializeEventDeck();
 
         int numberQuestCards = game.GetNumberQuestCards();
-        assertEquals(50, numberQuestCards);
+        assertEquals(12, numberQuestCards);
 
         int numberEventCards = game.GetNumberEventCards();
-        assertEquals(50, numberEventCards);
+        assertEquals(5, numberEventCards);
     }
 
     @Test
