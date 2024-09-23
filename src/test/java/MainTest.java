@@ -1,20 +1,29 @@
-package org.example;
 
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MainTest {
+    static Main game;
+
+    @BeforeAll
+    static void initAll() {
+        System.out.println("Init All");
+         game = new Main();
+         game.InitializeAdventureDeck();
+         game.InitializeEventDeck();
+    }
+
+
     @Test
     @DisplayName("Check adventure deck size is 100")
     void RESP_01_test_01() {
-        Main game = new Main();
-        game.InitializeAdventureDeck();
-
         int deckSize = game.GetAdventureDeckSize();
         assertEquals(100, deckSize);
     }
@@ -22,9 +31,6 @@ class MainTest {
     @Test
     @DisplayName("Check event deck size is 17")
     void RESP_01_test_02() {
-        Main game = new Main();
-        game.InitializeEventDeck();
-
         int deckSize = game.GetEventDeckSize();
         assertEquals(17, deckSize);
     }
@@ -32,9 +38,6 @@ class MainTest {
     @Test
     @DisplayName("Check there are 50 foe cards and 50 weapon cards")
     void RESP_01_test_03() {
-        Main game = new Main();
-        game.InitializeAdventureDeck();
-
         int numberFoes = game.GetNumberFoes();
         assertEquals(50, numberFoes);
 
@@ -45,9 +48,6 @@ class MainTest {
     @Test
     @DisplayName("Check there is 12 quest cards and 5 event card")
     void RESP_01_test_04() {
-        Main game = new Main();
-        game.InitializeEventDeck();
-
         int numberQuestCards = game.GetNumberQuestCards();
         assertEquals(12, numberQuestCards);
 
@@ -58,9 +58,7 @@ class MainTest {
     @Test
     @DisplayName("Check there are correct number of each value of foe cards")
     void RESP_01_test_05() {
-        Main game = new Main();
-        game.InitializeAdventureDeck();
-        ArrayList<Main.Card> deck = game.getAdventureDeck();
+        ArrayList<Card> deck = game.getAdventureDeck();
         int numberFoeCards = 50;
         int numberWeaponCards = 50;
         int[] value = {
@@ -107,9 +105,7 @@ class MainTest {
     @Test
     @DisplayName("Check there are correct number of each value of event cards")
     void RESP_01_test_06() {
-        Main game = new Main();
-        game.InitializeEventDeck();
-        ArrayList<Main.Card> deck = game.getEventDeck();
+        ArrayList<Card> deck = game.getEventDeck();
 
         int[] qValue = {2, 2, 2,
                 3, 3, 3, 3,
@@ -131,5 +127,15 @@ class MainTest {
 
     }
 
+    @Test
+    @DisplayName("Distributes 12 adventure cards to each player and updates the deck")
+    void RESP_02_test_01(){
+        assertEquals(12, game.player1Deck.size());
+        assertEquals(12, game.player2Deck.size());
+        assertEquals(12, game.player3Deck.size());
+        assertEquals(12, game.player4Deck.size());
 
+        assertEquals(52, game.getAdventureDeck().size());
+    }
+    
 }
