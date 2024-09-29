@@ -131,11 +131,10 @@ class MainTest {
     @DisplayName("Distributes 12 adventure cards to each player and updates the deck")
     void RESP_02_test_01() {
         game.distributeCards();
-        assertEquals(12, game.player1Deck.size());
-//        assertEquals(12, game.player2Deck.size());
-//        assertEquals(12, game.player3Deck.size());
-//        assertEquals(12, game.player4Deck.size());
-
+        assertEquals(12, game.p1.hand.size());
+        assertEquals(12, game.p2.hand.size());
+        assertEquals(12, game.p3.hand.size());
+        assertEquals(12, game.p4.hand.size());
         assertEquals(52, game.getAdventureDeck().size());
     }
 

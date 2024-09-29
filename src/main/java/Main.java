@@ -136,11 +136,6 @@ public class Main {
         p3.hand.sort(new CardComparator());
         p4.hand.sort(new CardComparator());
 
-        System.out.println(p1.hand);
-        System.out.println(p2.hand);
-        System.out.println(p3.hand);
-        System.out.println(p4.hand);
-
 
     }
 
