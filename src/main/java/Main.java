@@ -10,10 +10,10 @@ public class Main {
     ArrayList<Card> adventureDeck = new ArrayList<>();
     ArrayList<Card> eventDeck = new ArrayList<>();
 
-    ArrayList<Card> player1Deck = new ArrayList<>();
-    ArrayList<Card> player2Deck = new ArrayList<>();
-    ArrayList<Card> player3Deck = new ArrayList<>();
-    ArrayList<Card> player4Deck = new ArrayList<>();
+    Player p1 = new Player(1);
+    Player p2 = new Player(2);
+    Player p3 = new Player(3);
+    Player p4 = new Player(4);
 
     final int numberTypesOfFoes = 10;
 
@@ -85,7 +85,6 @@ public class Main {
         for (int i = 0; i < numberWeaponTypes; i++) {
             for (int j = 0; j < numberWeapons[i]; j++) {
                 newCard = new Card(wValue[i], wType[i]);
-                System.out.println(wType[i] + wValue[i]);
                 adventureDeck.add(count, newCard);
                 count++;
             }
@@ -121,8 +120,40 @@ public class Main {
         }
     }
 
-    public void distributeCards(){ // TODO: use Collections.shuffle(mylist); to shuffle
+    public void distributeCards() { // TODO: use Collections.shuffle(mylist); to shuffle
+        Collections.shuffle(adventureDeck);
 
+        int defaultNumCard = 12;
+        for (int i = 0; i < defaultNumCard; i++) {
+            p1.hand.add(drawAdventureCard());
+            p2.hand.add(drawAdventureCard());
+            p3.hand.add(drawAdventureCard());
+            p4.hand.add(drawAdventureCard());
+
+        }
+        p1.hand.sort(new CardComparator());
+        p2.hand.sort(new CardComparator());
+        p3.hand.sort(new CardComparator());
+        p4.hand.sort(new CardComparator());
+
+        System.out.println(p1.hand);
+        System.out.println(p2.hand);
+        System.out.println(p3.hand);
+        System.out.println(p4.hand);
+
+
+    }
+
+    public Card drawAdventureCard() {
+        return adventureDeck.removeFirst();
+    }
+
+    class CardComparator implements Comparator<Card> {
+        // Overriding compare()method of Comparator
+        @Override
+        public int compare(Card c1, Card c2) {
+            return c1.compare(c2);
+        }
     }
 
 }
