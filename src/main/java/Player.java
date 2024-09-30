@@ -12,5 +12,9 @@ public class Player {
         shields = 0;
     }
 
+    public boolean hasWon() {
+        return shields >= 7;
+    }
+
 
 }
