@@ -7,14 +7,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MainTest {
     static Main game;
 
-    @BeforeAll
-    static void initAll() {
+    @BeforeEach
+    void initAll() {
         game = new Main();
         game.InitializeAdventureDeck();
         game.InitializeEventDeck();
@@ -157,6 +156,18 @@ class MainTest {
             }
         }
         return true;
+    }
+
+    @Test
+    @DisplayName("At the end of a turn, game determines if one or more players have 7 shields")
+    void RESP_03_test_01() {
+        game.distributeCards();
+        if(game.p1.hasWon() || game.p2.hasWon() || game.p3.hasWon() || game.p4.hasWon()) {
+            assertTrue(game.checkForWinner());
+        }else{
+            assertFalse(game.checkForWinner());
+        }
+
     }
 
 // QUESTION: What to do if you realize you need another test?

@@ -120,27 +120,27 @@ public class Main {
         }
     }
 
-    public void distributeCards() { // TODO: use Collections.shuffle(mylist); to shuffle
+    public void distributeCards() {
         Collections.shuffle(adventureDeck);
-
         int defaultNumCard = 12;
         for (int i = 0; i < defaultNumCard; i++) {
             p1.hand.add(drawAdventureCard());
             p2.hand.add(drawAdventureCard());
             p3.hand.add(drawAdventureCard());
             p4.hand.add(drawAdventureCard());
-
         }
         p1.hand.sort(new CardComparator());
         p2.hand.sort(new CardComparator());
         p3.hand.sort(new CardComparator());
         p4.hand.sort(new CardComparator());
-
-
     }
 
     public Card drawAdventureCard() {
         return adventureDeck.removeFirst();
+    }
+
+    public boolean checkForWinner(){
+        return true;
     }
 
     class CardComparator implements Comparator<Card> {
@@ -150,5 +150,7 @@ public class Main {
             return c1.compare(c2);
         }
     }
+
+
 
 }
