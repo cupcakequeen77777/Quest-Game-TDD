@@ -140,7 +140,7 @@ public class Main {
     }
 
     public boolean checkForWinner(){
-        return true;
+        return p1.hasWon() || p2.hasWon() || p3.hasWon() || p4.hasWon();
     }
 
     class CardComparator implements Comparator<Card> {
