@@ -145,9 +145,33 @@ public class Main {
         return p1.hasWon() || p2.hasWon() || p3.hasWon() || p4.hasWon();
     }
 
+    public ArrayList<String> getListOfWinners() {
+        ArrayList<String> winners = new ArrayList<>();
+        if (p1.hasWon()) {
+            winners.add(p1.playerNumber + ""); // QUESTION: what is the winner IDs?
+        }
+        if (p2.hasWon()) {
+            winners.add(p2.playerNumber + "");
+        }
+        if (p3.hasWon()) {
+            winners.add(p3.playerNumber + "");
+        }
+        if (p4.hasWon()) {
+            winners.add(p4.playerNumber + "");
+        }
+        return winners;
+    }
 
     public String getWinners() {
-        return "";
+        ArrayList<String> winners = getListOfWinners();
+        StringBuilder winner = new StringBuilder();
+        if (!winners.isEmpty()) {
+            winner.append("End of game!\nWinners!\n");
+            for (String s : winners) {
+                winner.append(s).append(" ");
+            }
+        }
+        return winner.toString();
     }
 
 
