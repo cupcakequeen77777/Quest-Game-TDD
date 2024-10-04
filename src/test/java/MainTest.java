@@ -234,4 +234,13 @@ class MainTest {
         assertEquals("", game.getWinners());
     }
 
+    @Test
+    @DisplayName("Current player draws the next event card")
+    void RESP_05_test_01() {
+        game.playerTurn = 2;
+        game.drawEventCard();
+        assertEquals(16, game.eventDeck.size());
+    }
+
+
 }

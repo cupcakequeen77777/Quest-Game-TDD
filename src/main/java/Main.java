@@ -18,6 +18,7 @@ public class Main {
 
     final int numberTypesOfFoes = 10;
     final int numberPlayers = 4;
+    int playerTurn = 0;
 
     public ArrayList<Card> getAdventureDeck() {
         return adventureDeck;
@@ -174,14 +175,18 @@ public class Main {
         return winner.toString();
     }
 
+    public Card drawEventCard() {
+        return null;
+    }
 
-    class CardComparator implements Comparator<Card> {
+
+
+        class CardComparator implements Comparator<Card> {
         // Overriding compare()method of Comparator
         @Override
         public int compare(Card c1, Card c2) {
             return c1.compare(c2);
         }
     }
-
 
 }
