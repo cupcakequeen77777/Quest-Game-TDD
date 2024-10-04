@@ -176,10 +176,13 @@ public class Main {
     }
 
     public Card drawEventCard() {
-        return null;
+        return eventDeck.removeFirst();
     }
 
-
+    public int startTurn(){
+        Card newCard = drawEventCard();
+        return playerTurn;
+    }
 
         class CardComparator implements Comparator<Card> {
         // Overriding compare()method of Comparator
