@@ -10,12 +10,14 @@ public class Main {
     ArrayList<Card> adventureDeck = new ArrayList<>();
     ArrayList<Card> eventDeck = new ArrayList<>();
 
+    // TODO: change in refactor to array list
     Player p1 = new Player(1);
     Player p2 = new Player(2);
     Player p3 = new Player(3);
     Player p4 = new Player(4);
 
     final int numberTypesOfFoes = 10;
+    final int numberPlayers = 4;
 
     public ArrayList<Card> getAdventureDeck() {
         return adventureDeck;
@@ -139,9 +141,15 @@ public class Main {
         return adventureDeck.removeFirst();
     }
 
-    public boolean checkForWinner(){
+    public boolean checkForWinner() {
         return p1.hasWon() || p2.hasWon() || p3.hasWon() || p4.hasWon();
     }
+
+
+    public String getWinners() {
+        return "";
+    }
+
 
     class CardComparator implements Comparator<Card> {
         // Overriding compare()method of Comparator
@@ -150,7 +158,6 @@ public class Main {
             return c1.compare(c2);
         }
     }
-
 
 
 }

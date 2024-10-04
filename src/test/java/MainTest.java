@@ -190,8 +190,48 @@ class MainTest {
 
     // QUESTION: What to do if you realize you need another test?
 
+    @Test
+    @DisplayName("Game displays the id of each winner and then terminates, one winner")
+    void RESP_04_test_01() {
+        game.p1.shields = 7;
+        assertEquals("End of game!\nWinners!\n1 ", game.getWinners());
+    }
 
+    @Test
+    @DisplayName("Game displays the id of each winner and then terminates, two winners")
+    void RESP_04_test_02() {
+        game.p3.shields = 7;
+        game.p4.shields = 7;
+        assertEquals("End of game!\nWinners!\n3 4 ", game.getWinners());
+    }
 
+    @Test
+    @DisplayName("Game displays the id of each winner and then terminates, three winners")
+    void RESP_04_test_03() {
+        game.p4.shields = 7;
+        game.p2.shields = 7;
+        game.p3.shields = 7;
+        assertEquals("End of game!\nWinners!\n2 3 4 ", game.getWinners());
+    }
 
+    @Test
+    @DisplayName("Game displays the id of each winner and then terminates, four winners")
+    void RESP_04_test_04() {
+        game.p1.shields = 7;
+        game.p2.shields = 7;
+        game.p3.shields = 7;
+        game.p4.shields = 7;
+        assertEquals("End of game!\nWinners!\n1 2 3 4 ", game.getWinners());
+    }
+
+    @Test
+    @DisplayName("Game displays the id of each winner and then terminates, no winners")
+    void RESP_04_test_05() {
+        game.p1.shields = 0;
+        game.p2.shields = 0;
+        game.p3.shields = 0;
+        game.p4.shields = 0;
+        assertEquals("", game.getWinners());
+    }
 
 }
