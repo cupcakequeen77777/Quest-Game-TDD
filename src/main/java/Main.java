@@ -7,24 +7,19 @@ public class Main {
         System.out.print("Adventure Game!");
     }
 
-    ArrayList<Card> adventureDeck = new ArrayList<>();
-    ArrayList<Card> eventDeck = new ArrayList<>();
-
-    // TODO: change in refactor to array list
-    Player p1 = new Player(1);
-    Player p2 = new Player(2);
-    Player p3 = new Player(3);
-    Player p4 = new Player(4);
-
     final int numberTypesOfFoes = 10;
     final int numberPlayers = 4;
     int playerTurn = 0;
 
-    public ArrayList<Card> getAdventureDeck() {
+    Deck adventureDeck = new Deck(50);
+    Deck eventDeck = new Deck(50);
+    ArrayList<Player> players = new ArrayList<>(numberPlayers);
+
+    public Deck getAdventureDeck() {
         return adventureDeck;
     }
 
-    public ArrayList<Card> getEventDeck() {
+    public Deck getEventDeck() {
         return eventDeck;
     }
 
@@ -38,7 +33,7 @@ public class Main {
 
     public int GetNumberWeapons() {
         int count = 0;
-        for (Card card : adventureDeck) {
+        for (Card card : adventureDeck.getDeck()) {
             if (!Objects.equals(card.GetCardType(), "F")) {
                 count++;
             }
@@ -46,9 +41,9 @@ public class Main {
         return count;
     }
 
-    private int GetNumberOfType(String type, ArrayList<Card> deck) {
+    private int GetNumberOfType(String type, Deck deck) {
         int count = 0;
-        for (Card card : deck) {
+        for (Card card : deck.getDeck()) {
             if (Objects.equals(card.GetCardType(), type)) {
                 count++;
             }
@@ -76,20 +71,21 @@ public class Main {
         String[] wType = {"D", "H", "S", "B", "L", "E"};
         int[] numberWeapons = {6, 12, 16, 8, 6, 2}; // of certain value
         int numberWeaponTypes = 6;
-        int count = 0;
+//        int count = 0;
         for (int i = 0; i < numberTypesOfFoes; i++) {
             for (int j = 0; j < numberFoes[i]; j++) {
                 newCard = new Card(value[i], "F");
-                adventureDeck.add(count, newCard);
-                count++;
+                adventureDeck.add(newCard);
+//                count++;
             }
         }
 
         for (int i = 0; i < numberWeaponTypes; i++) {
             for (int j = 0; j < numberWeapons[i]; j++) {
                 newCard = new Card(wValue[i], wType[i]);
-                adventureDeck.add(count, newCard);
-                count++;
+                adventureDeck.add(newCard);
+//                adventureDeck.add(count, newCard);
+//                count++;
             }
         }
 
@@ -100,13 +96,13 @@ public class Main {
         int[] value = {2, 3, 4, 5};
         int[] numberQuests = {3, 4, 3, 2}; // of certain value
         int numberTypesOfQuests = 4;
-        int count = 0;
+//        int count = 0;
 
         for (int i = 0; i < numberTypesOfQuests; i++) {
             for (int j = 0; j < numberQuests[i]; j++) {
                 newCard = new Card(value[i], "Q");
-                eventDeck.add(count, newCard);
-                count++;
+                eventDeck.add(newCard);
+//                count++;
             }
         }
 
@@ -117,48 +113,46 @@ public class Main {
         for (int i = 0; i < numberTypesOfEvents; i++) {
             for (int j = 0; j < numberEvents[i]; j++) {
                 newCard = new Card(eValue[i], "E");
-                eventDeck.add(count, newCard);
-                count++;
+                eventDeck.add(newCard);
+//                count++;
             }
         }
     }
 
     public void distributeCards() {
-        Collections.shuffle(adventureDeck);
+        adventureDeck.shuffle();
         int defaultNumCard = 12;
         for (int i = 0; i < defaultNumCard; i++) {
-            p1.hand.add(drawAdventureCard());
-            p2.hand.add(drawAdventureCard());
-            p3.hand.add(drawAdventureCard());
-            p4.hand.add(drawAdventureCard());
+            players.get(0).hand.add(drawAdventureCard());
+            players.get(1).hand.add(drawAdventureCard());
+            players.get(2).hand.add(drawAdventureCard());
+            players.get(3).hand.add(drawAdventureCard());
         }
-        p1.hand.sort(new CardComparator());
-        p2.hand.sort(new CardComparator());
-        p3.hand.sort(new CardComparator());
-        p4.hand.sort(new CardComparator());
+
+        for (Player player : players) {
+            player.hand.sort();
+        }
     }
 
     public Card drawAdventureCard() {
-        return adventureDeck.removeFirst();
+        return adventureDeck.drawCard();
     }
 
     public boolean checkForWinner() {
-        return p1.hasWon() || p2.hasWon() || p3.hasWon() || p4.hasWon();
+        for (Player player : players) {
+            if (player.hasWon()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public ArrayList<String> getListOfWinners() {
         ArrayList<String> winners = new ArrayList<>();
-        if (p1.hasWon()) {
-            winners.add(p1.playerNumber + ""); // QUESTION: what is the winner IDs?
-        }
-        if (p2.hasWon()) {
-            winners.add(p2.playerNumber + "");
-        }
-        if (p3.hasWon()) {
-            winners.add(p3.playerNumber + "");
-        }
-        if (p4.hasWon()) {
-            winners.add(p4.playerNumber + "");
+        for (Player player : players) {
+            if (player.hasWon()) {
+                winners.add(player.playerNumber + ""); // QUESTION: what is the winner IDs?
+            }
         }
         return winners;
     }
@@ -179,17 +173,11 @@ public class Main {
         return eventDeck.removeFirst();
     }
 
-    public int startTurn(){
-        Card newCard = drawEventCard();
-        return playerTurn;
     }
 
-        class CardComparator implements Comparator<Card> {
-        // Overriding compare()method of Comparator
-        @Override
-        public int compare(Card c1, Card c2) {
-            return c1.compare(c2);
         }
+
+        return playerTurn;
     }
 
 }
