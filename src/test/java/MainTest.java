@@ -159,17 +159,39 @@ class MainTest {
     }
 
     @Test
-    @DisplayName("At the end of a turn, game determines if one or more players have 7 shields")
+    @DisplayName("At the end of a turn, game determines if one or more players have 7 shields, when there is one winner")
     void RESP_03_test_01() {
-        game.distributeCards();
-        if(game.p1.hasWon() || game.p2.hasWon() || game.p3.hasWon() || game.p4.hasWon()) {
-            assertTrue(game.checkForWinner());
-        }else{
-            assertFalse(game.checkForWinner());
-        }
-
+        game.p1.shields = 7;
+        game.p2.shields = 5;
+        game.p3.shields = 2;
+        game.p4.shields = 3;
+        assertTrue(game.checkForWinner());
     }
 
-// QUESTION: What to do if you realize you need another test?
+    @Test
+    @DisplayName("At the end of a turn, game determines if one or more players have 7 shields, when there are no winner yet")
+    void RESP_03_test_02() {
+        game.p1.shields = 6;
+        game.p2.shields = 5;
+        game.p3.shields = 2;
+        game.p4.shields = 3;
+        assertFalse(game.checkForWinner());
+    }
+
+    @Test
+    @DisplayName("At the end of a turn, game determines if one or more players have 7 shields, when there are more then one winners")
+    void RESP_03_test_03() {
+        game.p1.shields = 7;
+        game.p2.shields = 7;
+        game.p3.shields = 2;
+        game.p4.shields = 3;
+        assertTrue(game.checkForWinner());
+    }
+
+    // QUESTION: What to do if you realize you need another test?
+
+
+
+
 
 }
