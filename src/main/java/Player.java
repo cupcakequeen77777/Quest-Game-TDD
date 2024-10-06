@@ -16,6 +16,10 @@ public class Player {
         return shields >= 7;
     }
 
+    public void setShields(int shields) {
+        this.shields = shields;
+    }
+
     public void plague(){
         shields = shields - 2;
         if(shields<0){

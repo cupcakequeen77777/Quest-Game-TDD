@@ -243,5 +243,36 @@ class MainTest {
         assertEquals(16, game.eventDeck.size());
     }
 
+    @Test
+    @DisplayName("Game carries out the action(s) triggered by an E card, plague")
+    void RESP_06_test_01() {
+        game.playerTurn = 2;
+        game.players.get(1).setShields(4);
+        Card plagueCard = new Card(1, "E");
+        game.resolveEvent(plagueCard);
+        assertEquals(2, game.players.get(1).shields);
+    }
 
+    @Test
+    @DisplayName("Game carries out the action(s) triggered by an E card, Queen’s favor card")
+    void RESP_06_test_02() {
+        game.playerTurn = 2;
+        game.players.get(1).setShields(4);
+        Card queenCard = new Card(2, "E");
+        game.resolveEvent(queenCard);
+        assertEquals(2, game.players.get(1).hand.size());
+    }
+
+    @Test
+    @DisplayName("Game carries out the action(s) triggered by an E card, Prosperity card")
+    void RESP_06_test_03() {
+        game.playerTurn = 2;
+        game.players.get(1).setShields(4);
+        Card prosperity = new Card(3, "E");
+        game.resolveEvent(prosperity);
+        assertEquals(2, game.players.get(0).hand.size());
+        assertEquals(2, game.players.get(1).hand.size());
+        assertEquals(2, game.players.get(2).hand.size());
+        assertEquals(2, game.players.get(3).hand.size());
+    }
 }

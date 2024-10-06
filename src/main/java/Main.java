@@ -170,14 +170,12 @@ public class Main {
     }
 
     public Card drawEventCard() {
-        return eventDeck.removeFirst();
+        return eventDeck.drawCard();
     }
+
+    public void resolveEvent(Card newCard) {
 
     }
 
-        }
-
-        return playerTurn;
-    }
 
 }
