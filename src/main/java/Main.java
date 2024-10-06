@@ -174,7 +174,24 @@ public class Main {
     }
 
     public void resolveEvent(Card newCard) {
+        Player currentPlayer = players.get(playerTurn-1);
+        switch (newCard.cardValue) {
+            case 1: // Plague: current player loses 2 shields
+                currentPlayer.plague();
+                break;
+            case 2: // Queen’s favor: current player draws 2 adventure cards and possibly trims their hand (UC-03)
+                currentPlayer.addCard(drawAdventureCard());
+                currentPlayer.addCard(drawAdventureCard());
+                break;
+            case 3: // Prosperity: All players draw 2 adventure cards and each of them possibly trims their hand (UC-03)
+                for (Player player : players) {
+                    player.addCard(drawAdventureCard());
+                    player.addCard(drawAdventureCard());
+                }
 
+                break;
+
+        }
     }
 
 
