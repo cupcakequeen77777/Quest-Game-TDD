@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -238,7 +240,7 @@ class MainTest {
     @Test
     @DisplayName("Current player draws the next event card")
     void RESP_05_test_01() {
-        game.playerTurn = 2;
+        game.playerTurn = 1;
         game.drawEventCard();
         assertEquals(16, game.eventDeck.size());
     }
@@ -246,7 +248,7 @@ class MainTest {
     @Test
     @DisplayName("Game carries out the action(s) triggered by an E card, plague")
     void RESP_06_test_01() {
-        game.playerTurn = 2;
+        game.playerTurn = 1;
         game.players.get(1).setShields(4);
         Card plagueCard = new Card(1, "E");
         game.resolveEvent(plagueCard);
@@ -256,7 +258,7 @@ class MainTest {
     @Test
     @DisplayName("Game carries out the action(s) triggered by an E card, Queen’s favor card")
     void RESP_06_test_02() {
-        game.playerTurn = 2;
+        game.playerTurn = 1;
         game.players.get(1).setShields(4);
         Card queenCard = new Card(2, "E");
         game.resolveEvent(queenCard);
@@ -266,7 +268,7 @@ class MainTest {
     @Test
     @DisplayName("Game carries out the action(s) triggered by an E card, Prosperity card")
     void RESP_06_test_03() {
-        game.playerTurn = 2;
+        game.playerTurn = 1;
         game.players.get(1).setShields(4);
         Card prosperity = new Card(3, "E");
         game.resolveEvent(prosperity);
@@ -274,5 +276,58 @@ class MainTest {
         assertEquals(2, game.players.get(1).hand.size());
         assertEquals(2, game.players.get(2).hand.size());
         assertEquals(2, game.players.get(3).hand.size());
+    }
+
+
+    @Test
+    @DisplayName("Game handles the drawing of a Q card")
+    void RESP_07_test_01() {
+        game.playerTurn = 1;
+        Card quest = new Card(1, "Q");
+        game.startQuest(quest);
+
+
+    }
+
+    @Test
+    @DisplayName("Game handles the quest sponsorship, everyone declines")
+    void RESP_07_test_02() {
+        game.playerTurn = 0;
+        Card quest = new Card(1, "Q");
+        game.startQuest(quest);
+
+
+    }
+
+    @Test
+    @DisplayName("Game handles quest sponsorship, first player accepts")
+    void RESP_07_test_03() {
+        game.playerTurn = 0;
+        String simulatedInput = "y\n"; // Replace with the expected input for requestSponsorship
+        InputStream inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
+        System.setIn(inputStream);
+        game.requestSponsorship(game.playerTurn);
+        System.setIn(System.in); // Restore System.in to its original state
+
+    }
+
+    @Test
+    @DisplayName("Game handles quest sponsorship, second player accepts")
+    void RESP_07_test_04() {
+        game.playerTurn = 3;
+
+        String simulatedInput = "n\n"; // Replace with the expected input for requestSponsorship
+        InputStream inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
+        System.setIn(inputStream);
+        assertFalse(game.requestSponsorship(game.playerTurn));
+        System.setIn(System.in); // Restore System.in to its original state
+
+        simulatedInput = "y\n"; // Replace with the expected input for requestSponsorship
+        inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
+        System.setIn(inputStream);
+        assertTrue(game.requestSponsorship(game.nextPlayer()));
+        System.setIn(System.in); // Restore System.in to its original state
+
+
     }
 }

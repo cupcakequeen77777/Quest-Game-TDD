@@ -5,6 +5,7 @@ public class Player {
     Deck hand;
     final int MAX_CARDS = 12;
     int shields;
+    boolean sponsor = false;
 
     public Player(int playerNumber) {
         this.playerNumber = playerNumber;
@@ -30,6 +31,10 @@ public class Player {
     // TODO: add card to deck
     public void addCard(Card card){
         hand.add(card);
+    }
+
+    public Card remove(){
+        return hand.drawCard();
     }
 
 

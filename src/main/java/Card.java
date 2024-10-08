@@ -36,5 +36,9 @@ public class Card {
         return Integer.compare(cardValue, card.cardValue);
     }
 
+    public boolean equals(Card card) {
+        return cardValue == card.cardValue && type.equals(card.type);
+    }
+
 
 }

@@ -194,5 +194,28 @@ public class Main {
         }
     }
 
+    public boolean requestSponsorship(int player) {
+        String prompt = "Player " + (player + 1) + " do you want to sponsor (y/N): ";
+        String response = ConsoleInputReader.readUserInput(prompt);  // Read user input
+        System.out.println("Response: " + response);  // Output user input
+        if (response.equalsIgnoreCase("y")) {  // Prompt the current player to sponsor the quest.
+            players.get(player).sponsor = true;
+            return true;
+        }
+        sponsorCount++;
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        return false;// Continue this process until a player agrees to sponsor or all players decline.
+    }
 
+    public int nextPlayer() {
+        return (playerTurn + 1) % numberPlayers;
+    }
+
+    public static class ConsoleInputReader {
+        public static String readUserInput(String prompt) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print(prompt);
+            return scanner.nextLine();
+        }
+    }
 }

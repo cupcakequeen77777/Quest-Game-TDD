@@ -24,6 +24,15 @@ public class Deck {
         return deck.get(i);
     }
 
+    public Card removeCard(Card x) {
+        for (int i = 0; i < deck.size(); i++) {
+            if(deck.get(i).equals(x)) {
+                return deck.remove(i);
+            }
+        }
+        return null;
+    }
+
     public void add(Card card) {
         deck.add(card);
     }
@@ -42,6 +51,11 @@ public class Deck {
 
     public int size() {
         return deck.size();
+    }
+
+    @Override
+    public String toString() {
+        return deck.toString();
     }
 
     static class CardComparator implements Comparator<Card> {
