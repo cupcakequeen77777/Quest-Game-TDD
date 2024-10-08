@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.*;
+import java.util.Scanner;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class Main {
     public static void main(String[] args) {
@@ -10,10 +12,12 @@ public class Main {
     final int numberTypesOfFoes = 10;
     final int numberPlayers = 4;
     int playerTurn = 0;
+    int sponsorCount = 0;
 
     Deck adventureDeck = new Deck(50);
     Deck eventDeck = new Deck(50);
     ArrayList<Player> players = new ArrayList<>(numberPlayers);
+    Deck discardDeck = new Deck(100);
 
     public Deck getAdventureDeck() {
         return adventureDeck;
@@ -174,7 +178,7 @@ public class Main {
     }
 
     public void resolveEvent(Card newCard) {
-        Player currentPlayer = players.get(playerTurn-1);
+        Player currentPlayer = players.get(playerTurn);
         switch (newCard.cardValue) {
             case 1: // Plague: current player loses 2 shields
                 currentPlayer.plague();
@@ -194,6 +198,24 @@ public class Main {
         }
     }
 
+    public void startQuest(Card newCard) {
+        if (requestSponsorships()) { // If a player agrees to sponsor, proceed to the quest setup.
+            System.out.println("Quest Setup");
+        } else { // If all players decline, discard the Q card and end the current player’s turn.
+            discardDeck.add(newCard);
+            playerTurn = (playerTurn + 1) % numberPlayers;
+        }
+    }
+
+    public boolean requestSponsorships() {
+        for (int i = 0; i < numberPlayers; i++) { // If the current player declines, prompt the next player in the order of play.
+            if(requestSponsorship((playerTurn + i) % numberPlayers)) {
+                return true;
+            }
+        }
+        return false; // Continue this process until a player agrees to sponsor or all players decline.
+    }
+
     public boolean requestSponsorship(int player) {
         String prompt = "Player " + (player + 1) + " do you want to sponsor (y/N): ";
         String response = ConsoleInputReader.readUserInput(prompt);  // Read user input
@@ -210,6 +232,21 @@ public class Main {
     public int nextPlayer() {
         return (playerTurn + 1) % numberPlayers;
     }
+
+    public int startTurn(Card newCard) {
+        switch (newCard.type) {
+            case "E":
+                resolveEvent(newCard);
+                break;
+            case "Q":
+                startQuest(newCard);
+                break;
+        }
+        // TODO: check hand limit then, possibly trims their hand
+
+        return playerTurn;
+    }
+
 
     public static class ConsoleInputReader {
         public static String readUserInput(String prompt) {
