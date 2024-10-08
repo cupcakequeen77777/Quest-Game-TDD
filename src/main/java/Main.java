@@ -1,3 +1,4 @@
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -13,6 +14,7 @@ public class Main {
     final int numberPlayers = 4;
     int playerTurn = 0;
     int sponsorCount = 0;
+    Card quest = null;
 
     Deck adventureDeck = new Deck(50);
     Deck eventDeck = new Deck(50);
@@ -197,36 +199,27 @@ public class Main {
 
         }
     }
-
-    public void startQuest(Card newCard) {
-        if (requestSponsorships()) { // If a player agrees to sponsor, proceed to the quest setup.
-            System.out.println("Quest Setup");
-        } else { // If all players decline, discard the Q card and end the current player’s turn.
-            discardDeck.add(newCard);
-            playerTurn = (playerTurn + 1) % numberPlayers;
-        }
-    }
-
-    public boolean requestSponsorships() {
-        for (int i = 0; i < numberPlayers; i++) { // If the current player declines, prompt the next player in the order of play.
-            if(requestSponsorship((playerTurn + i) % numberPlayers)) {
-                return true;
-            }
-        }
-        return false; // Continue this process until a player agrees to sponsor or all players decline.
-    }
-
-    public boolean requestSponsorship(int player) {
+    /*
+    Output: player number if found sponsor, if all players decline -2, if current player declines -1
+     */
+    public int requestSponsorship(Scanner input, PrintWriter output, int player) {
         String prompt = "Player " + (player + 1) + " do you want to sponsor (y/N): ";
-        String response = ConsoleInputReader.readUserInput(prompt);  // Read user input
-        System.out.println("Response: " + response);  // Output user input
+        String response = PromptInput(input, output, prompt);
         if (response.equalsIgnoreCase("y")) {  // Prompt the current player to sponsor the quest.
             players.get(player).sponsor = true;
-            return true;
+            System.out.println("Quest Setup");
+            return player;
         }
         sponsorCount++;
+        if(sponsorCount>=numberPlayers){
+            discardDeck.add(quest);
+            quest = null;
+            playerTurn = nextPlayer();
+            sponsorCount = 0;
+            return -2;
+        }
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-        return false;// Continue this process until a player agrees to sponsor or all players decline.
+        return -1;// Continue this process until a player agrees to sponsor or all players decline.
     }
 
     public int nextPlayer() {
@@ -239,12 +232,33 @@ public class Main {
                 resolveEvent(newCard);
                 break;
             case "Q":
-                startQuest(newCard);
+                quest = newCard;
                 break;
         }
         // TODO: check hand limit then, possibly trims their hand
 
         return playerTurn;
+    }
+
+    public String PromptInput(Scanner input, PrintWriter output, String prompt) {
+        output.print(prompt);
+        output.flush();
+        return input.nextLine();
+    }
+
+    public int getCardIndex(PrintWriter output, String input) {
+        int cardIndex = -1;
+        try {
+            cardIndex = Integer.parseInt(input);
+            output.println("input is valid");
+        } catch (NumberFormatException e) {
+            output.println("input is not valid");
+        }
+        return cardIndex;
+    }
+
+    public void outInput(PrintWriter output, String str) {
+        output.println(str);
     }
 
 
