@@ -325,13 +325,40 @@ class MainTest {
     }
 
     @Test
+    @DisplayName("Game handles the quest sponsorship, everyone declines")
+    void RESP_08_test_01() {
+        game.playerTurn = 0;
 
-        simulatedInput = "y\n"; // Replace with the expected input for requestSponsorship
-        inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
-        System.setIn(inputStream);
-        assertTrue(game.requestSponsorship(game.nextPlayer()));
-        System.setIn(System.in); // Restore System.in to its original state
+        String input = "n\n";
+        StringWriter output = new StringWriter();
+        game.requestSponsorship(new Scanner(input), new PrintWriter(output), game.playerTurn);
+        game.playerTurn = game.nextPlayer();
+        assertEquals("Player 1 do you want to sponsor (y/N): ", output.toString());
+        assertFalse(game.players.get(0).sponsor);
 
+        input = "n\n";
+        output = new StringWriter();
+        game.requestSponsorship(new Scanner(input), new PrintWriter(output), game.playerTurn);
+        game.playerTurn = game.nextPlayer();
+        assertEquals("Player 2 do you want to sponsor (y/N): ", output.toString());
+        assertFalse(game.players.get(1).sponsor);
+
+        input = "n\n";
+        output = new StringWriter();
+        game.requestSponsorship(new Scanner(input), new PrintWriter(output), game.playerTurn);
+        game.playerTurn = game.nextPlayer();
+        assertEquals("Player 3 do you want to sponsor (y/N): ", output.toString());
+        assertFalse(game.players.get(2).sponsor);
+
+        input = "y\n";
+        output = new StringWriter();
+        game.requestSponsorship(new Scanner(input), new PrintWriter(output), game.playerTurn);
+        game.playerTurn = game.nextPlayer();
+        assertEquals("Player 4 do you want to sponsor (y/N): ", output.toString());
+        assertTrue(game.players.get(3).sponsor);
+
+        assertNull(game.quest);
 
     }
+
 }
