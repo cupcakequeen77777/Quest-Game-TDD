@@ -211,6 +211,7 @@ public class Main {
             return player;
         }
         sponsorCount++;
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         if(sponsorCount>=numberPlayers){
             discardDeck.add(quest);
             quest = null;
@@ -218,7 +219,6 @@ public class Main {
             sponsorCount = 0;
             return -2;
         }
-        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         return -1;// Continue this process until a player agrees to sponsor or all players decline.
     }
 
