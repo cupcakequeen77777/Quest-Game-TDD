@@ -40,6 +40,9 @@ public class Player {
     }
 
     public int numberToTrim(){
+        if(hand.size() > MAX_CARDS){
+            return hand.size() - MAX_CARDS;
+        }
         return 0;
     }
 

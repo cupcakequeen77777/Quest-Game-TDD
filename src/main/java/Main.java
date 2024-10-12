@@ -199,6 +199,7 @@ public class Main {
 
         }
     }
+
     /*
     Output: player number if found sponsor, if all players decline -2, if current player declines -1
      */
@@ -212,6 +213,7 @@ public class Main {
         }
         sponsorCount++;
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        if (sponsorCount >= numberPlayers) {
             discardDeck.add(quest);
             quest = null;
             playerTurn = nextPlayer();
@@ -245,29 +247,33 @@ public class Main {
         return input.nextLine();
     }
 
+    public int readCardInput(String input) {
         int cardIndex = -1;
         try {
             cardIndex = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            output.println("input is not valid");
+        } catch (NumberFormatException _) {
         }
         return cardIndex;
     }
 
     public ArrayList<Integer> numberCardsToTrim() {
         ArrayList<Integer> numberCardsToTrim = new ArrayList<>();
+        for (Player player : players) {
+            numberCardsToTrim.add(player.numberToTrim());
+        }
         return numberCardsToTrim;
     }
 
 
-    public static class ConsoleInputReader {
-        public static String readUserInput(String prompt) {
-            Scanner scanner = new Scanner(System.in);
-            System.out.print(prompt);
-            return scanner.nextLine();
     public void trimPlayerCard(int cardIndex, int playerIndex) {
+        Card discard = players.get(playerIndex).removeCard(cardIndex);
+        if (discard != null) {
+            discardDeck.add(discard);
         }
     }
+
     public void displayHand(PrintWriter output, int playerIndex) {
+        output.print(players.get(playerIndex).hand + "\n");
     }
+
 }
