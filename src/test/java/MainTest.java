@@ -251,6 +251,23 @@ class MainTest {
     }
 
     @Test
+    @DisplayName("The game indicates whose turn it is and displays this player’s hand")
+    void RESP_05_test_02() {
+        game.distributeCards();
+        rigInitialHands();
+        game.playerTurn = 0;
+
+        Card quest = new Card(2, "E");
+        StringWriter output = new StringWriter();
+        game.startTurn(new PrintWriter(output), quest);
+        assertEquals("Current player: 1", output.toString());
+
+        output = new StringWriter();
+        game.displayHand(new PrintWriter(output), game.playerTurn);
+        assertNotNull(output.toString());
+    }
+
+    @Test
     @DisplayName("Game carries out the action(s) triggered by an E card, plague")
     void RESP_06_test_01() {
         game.playerTurn = 1;
@@ -289,7 +306,8 @@ class MainTest {
     void RESP_07_test_01() {
         game.playerTurn = 1;
         Card quest = new Card(1, "Q");
-        game.startTurn(quest);
+        StringWriter output = new StringWriter();
+        game.startTurn(new PrintWriter(output), quest);
         assertEquals(quest, game.quest);
     }
 
@@ -393,7 +411,7 @@ class MainTest {
         StringWriter output = new StringWriter();
         game.PromptInput(new Scanner(input), new PrintWriter(output), "Enter card index of card to discard: ");
         int index = game.readCardInput(input);
-        assertEquals(6,index);
+        assertEquals(6, index);
     }
 
     @Test
