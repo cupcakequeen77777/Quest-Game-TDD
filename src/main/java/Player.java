@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class Player {
     int playerNumber;
     Deck hand;
@@ -33,8 +31,16 @@ public class Player {
         hand.add(card);
     }
 
-    public Card remove(){
+    public Card drawCard(){
         return hand.drawCard();
+    }
+
+    public Card removeCard(int index){
+        return hand.removeCard(index);
+    }
+
+    public int numberToTrim(){
+        return 0;
     }
 
 

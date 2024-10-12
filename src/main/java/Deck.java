@@ -33,6 +33,10 @@ public class Deck {
         return null;
     }
 
+    public Card removeCard(int index) {
+        return deck.remove(index);
+    }
+
     public void add(Card card) {
         deck.add(card);
     }

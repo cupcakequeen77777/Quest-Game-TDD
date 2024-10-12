@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -359,6 +361,88 @@ class MainTest {
 
         assertNull(game.quest);
 
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 2, 1, 3}) // six numbers
+    @DisplayName("The game computes n, the number of cards to discard by that player")
+    void RESP_09_test_01(int numberCardsToDraw) {
+        game.distributeCards();
+        for (int i = 0; i < numberCardsToDraw; i++) {
+            game.players.get(0).addCard(game.drawAdventureCard());
+        }
+        System.out.println(game.numberCardsToTrim());
+        assertEquals(numberCardsToDraw, game.numberCardsToTrim().get(0));
+    }
+
+    @Test
+    @DisplayName("The game displays the hand of the player and prompts the player for the position of the next card to delete")
+    void RESP_09_test_02() {
+        game.distributeCards();
+        int numberCardsToDraw = 2;
+        for (int i = 0; i < numberCardsToDraw; i++) {
+            game.players.get(0).addCard(game.drawAdventureCard());
+        }
+    }
+
+    @Test
+    @DisplayName("The player enters a valid position")
+    void RESP_09_test_03() {
+        String input = "6";
+        StringWriter output = new StringWriter();
+        game.PromptInput(new Scanner(input), new PrintWriter(output), "Enter card index of card to discard: ");
+        int index = game.readCardInput(input);
+        assertEquals(6,index);
+    }
+
+    @Test
+    @DisplayName("The game deletes the card from the player’s hand and displays the trimmed hand")
+    void RESP_09_test_04() {
+        int cardIndex = 3;
+        int playerIndex = 0;
+
+        game.distributeCards();
+        rigInitialHands();
+        Card card = new Card(5, "F");
+        game.players.get(playerIndex).addCard(card);
+
+        game.trimPlayerCard(cardIndex, playerIndex);
+        assertEquals(12, game.players.get(playerIndex).hand.size());
+
+        StringWriter output = new StringWriter();
+        game.displayHand(new PrintWriter(output), playerIndex);
+        assertEquals("[F5, F5, F15, D5, S10, S10, H10, H10, B15, B15, L20, F5]\n", output.toString());
+
+    }
+
+    void rigInitialHands() {
+        Player p1 = game.players.get(0);
+        Player p2 = game.players.get(1);
+        Player p3 = game.players.get(2);
+        Player p4 = game.players.get(3);
+
+        for (int i = 0; i < 12; i++) {
+            game.adventureDeck.add(p1.drawCard());
+            game.adventureDeck.add(game.players.get(1).drawCard());
+            game.adventureDeck.add(game.players.get(2).drawCard());
+            game.adventureDeck.add(game.players.get(3).drawCard());
+        }
+
+        int[] values1 = {5, 5, 15, 15, 5, 10, 10, 10, 10, 15, 15, 20};
+        String[] types1 = {"F", "F", "F", "F", "D", "S", "S", "H", "H", "B", "B", "L"};
+        int[] values2 = {5, 5, 15, 15, 40, 5, 10, 10, 10, 15, 15, 30};
+        String[] types2 = {"F", "F", "F", "F", "F", "D", "S", "H", "H", "B", "B", "E"};
+        int[] values3 = {5, 5, 5, 15, 5, 10, 10, 10, 10, 10, 15, 20};
+        String[] types3 = {"F", "F", "F", "F", "D", "S", "S", "S", "H", "H", "B", "L"};
+        int[] values4 = {5, 15, 15, 40, 5, 5, 10, 10, 10, 15, 20, 30};
+        String[] types4 = {"F", "F", "F", "F", "D", "D", "S", "H", "H", "B", "L", "E"};
+        for (int i = 0; i < values1.length; i++) {
+            p1.addCard(game.adventureDeck.removeCard(new Card(values1[i], types1[i])));
+            p2.addCard(game.adventureDeck.removeCard(new Card(values2[i], types2[i])));
+            p3.addCard(game.adventureDeck.removeCard(new Card(values3[i], types3[i])));
+            p4.addCard(game.adventureDeck.removeCard(new Card(values4[i], types4[i])));
+        }
     }
 
 }

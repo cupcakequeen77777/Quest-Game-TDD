@@ -212,7 +212,6 @@ public class Main {
         }
         sponsorCount++;
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-        if(sponsorCount>=numberPlayers){
             discardDeck.add(quest);
             quest = null;
             playerTurn = nextPlayer();
@@ -246,19 +245,18 @@ public class Main {
         return input.nextLine();
     }
 
-    public int getCardIndex(PrintWriter output, String input) {
         int cardIndex = -1;
         try {
             cardIndex = Integer.parseInt(input);
-            output.println("input is valid");
         } catch (NumberFormatException e) {
             output.println("input is not valid");
         }
         return cardIndex;
     }
 
-    public void outInput(PrintWriter output, String str) {
-        output.println(str);
+    public ArrayList<Integer> numberCardsToTrim() {
+        ArrayList<Integer> numberCardsToTrim = new ArrayList<>();
+        return numberCardsToTrim;
     }
 
 
@@ -267,6 +265,9 @@ public class Main {
             Scanner scanner = new Scanner(System.in);
             System.out.print(prompt);
             return scanner.nextLine();
+    public void trimPlayerCard(int cardIndex, int playerIndex) {
         }
+    }
+    public void displayHand(PrintWriter output, int playerIndex) {
     }
 }
