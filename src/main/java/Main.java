@@ -1,4 +1,5 @@
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -227,7 +228,8 @@ public class Main {
         return (playerTurn + 1) % numberPlayers;
     }
 
-    public int startTurn(Card newCard) {
+    public int startTurn(PrintWriter output, Card newCard) {
+        output.print("Current player: " + players.get(playerTurn).playerNumber);
         switch (newCard.type) {
             case "E":
                 resolveEvent(newCard);
@@ -236,7 +238,6 @@ public class Main {
                 quest = newCard;
                 break;
         }
-        // TODO: check hand limit then, possibly trims their hand
 
         return playerTurn;
     }
