@@ -336,8 +336,9 @@ public class Main {
     ArrayList<Player> eligibleParticipants(PrintWriter output) {
         ArrayList<Player> eligibleParticipants = new ArrayList<>();
         for (Player player : players) {
-            if (player.playerNumber != playerTurn && quest.numStages <= player.countFoes()) {
+            if (player.playerNumber-1 != playerTurn && quest.numStages <= player.countFoes()) {
                 eligibleParticipants.add(player);
+
             }
         }
         output.print(eligibleParticipants);
@@ -346,6 +347,18 @@ public class Main {
 
     ArrayList<Player> participateInQuest(Scanner input, PrintWriter output) {
         ArrayList<Player> participants = new ArrayList<>();
+        for (Player player : players) {
+            if (player.playerNumber != playerTurn-1 && quest.numStages <= player.countFoes()) {
+                String prompt = "Player " + player.playerNumber + " do you want to participate in the quest (y/N): ";
+                String response = PromptInput(input, output, prompt);
+                output.print(response + "\n");
+                if (response.equalsIgnoreCase("y")) {
+                    participants.add(player);
+
+                }
+
+            }
+        }
         output.print(participants);
         return participants;
     }
