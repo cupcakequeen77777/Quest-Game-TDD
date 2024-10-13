@@ -13,11 +13,11 @@ public class Card {
         type = t;
     }
 
-    public int GetFoeCardValue() {
+    public int getValue() {
         return cardValue;
     }
 
-    public String GetCardType() {
+    public String GetType() {
         return type;
     }
 
@@ -38,6 +38,14 @@ public class Card {
 
     public boolean equals(Card card) {
         return cardValue == card.cardValue && type.equals(card.type);
+    }
+
+    public boolean isWeapon(){
+        return !type.equals("F") && !type.equals("E")  && !type.equals("Q");
+    }
+
+    public boolean isFoe(){
+        return type.equals("F");
     }
 
 

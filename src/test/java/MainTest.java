@@ -1,20 +1,22 @@
 
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
+import org.mockito.Mockito.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class MainTest {
     static Main game;
@@ -84,8 +86,8 @@ class MainTest {
                 70};
 
         for (int i = 0; i < numberFoeCards; i++) {
-            assertEquals(value[i], deck.getCard(i).GetFoeCardValue());
-            assertEquals("F", deck.getCard(i).GetCardType());
+            assertEquals(value[i], deck.getCard(i).getValue());
+            assertEquals("F", deck.getCard(i).GetType());
         }
 
         int[] wValue = {
@@ -105,8 +107,8 @@ class MainTest {
                 "E", "E"};
 
         for (int i = numberFoeCards; i < numberFoeCards + numberWeaponCards; i++) {
-            assertEquals(wValue[i - 50], deck.getCard(i).GetFoeCardValue());
-            assertEquals(wType[i - 50], deck.getCard(i).GetCardType());
+            assertEquals(wValue[i - 50], deck.getCard(i).getValue());
+            assertEquals(wType[i - 50], deck.getCard(i).GetType());
         }
 
 
@@ -125,14 +127,14 @@ class MainTest {
         int[] eValue = {1, 2, 2, 3, 3};
 
         for (int i = 0; i < numberQuests; i++) {
-            assertEquals(qValue[i], deck.getCard(i).GetFoeCardValue());
-            assertEquals("Q", deck.getCard(i).GetCardType());
+            assertEquals(qValue[i], deck.getCard(i).getValue());
+            assertEquals("Q", deck.getCard(i).GetType());
         }
 
         for (int i = numberQuests; i < deck.size(); i++) {
-            System.out.println(deck.getCard(i).GetCardType() + deck.getCard(i).GetFoeCardValue());
-            assertEquals(eValue[i - numberQuests], deck.getCard(i).GetFoeCardValue());
-            assertEquals("E", deck.getCard(i).GetCardType());
+            System.out.println(deck.getCard(i).GetType() + deck.getCard(i).getValue());
+            assertEquals(eValue[i - numberQuests], deck.getCard(i).getValue());
+            assertEquals("E", deck.getCard(i).GetType());
         }
 
     }
@@ -421,7 +423,6 @@ class MainTest {
         int playerIndex = 0;
 
         game.distributeCards();
-        rigInitialHands();
         Card card = new Card(5, "F");
         game.players.get(playerIndex).addCard(card);
 
@@ -433,6 +434,74 @@ class MainTest {
         assertEquals("[F5, F5, F15, D5, S10, S10, H10, H10, B15, B15, L20, F5]\n", output.toString());
 
     }
+
+
+    @Test
+    @DisplayName("Test single stage")
+    void RESP_10_test_01() {
+        // Create a sponsor, quest, and hand with valid cards
+        Player sponsor = rigPLayer1Hands();
+        sponsor.hand.sort();
+        System.out.println(sponsor.hand);
+        Quest quest = new Quest(3); // Assuming a 3-stage quest
+
+        // Simulate user input to select the valid cards
+        StringWriter output = new StringWriter();
+
+        Scanner mockScanner = mock(Scanner.class);
+        when(mockScanner.nextLine()).thenReturn("0", "5", "quit");
+
+        assertNotNull(game.buildStage(quest, sponsor, 0, mockScanner, new PrintWriter(output)));
+
+    }
+
+    @Test
+    @DisplayName("Test valid quest setup with multiple stages")
+    void RESP_10_test_03() {
+        // Create a sponsor, quest, and hand with valid cards
+        Player sponsor = rigPLayer1Hands();
+        Quest quest = new Quest(4); // Assuming a 4-stage quest
+        sponsor.hand.sort();
+
+        // Simulate user input to select the valid cards
+        StringWriter output = new StringWriter();
+
+        Scanner mockScanner = mock(Scanner.class);
+        when(mockScanner.nextLine()).
+                thenReturn("0", "6", "quit").
+                thenReturn("1", "4", "quit").
+                thenReturn("1", "2", "3", "quit").
+                thenReturn("1", "2", "quit");
+
+        game.sponsorSetsUpQuest(sponsor, quest, mockScanner, new PrintWriter(output));
+
+        assertEquals("""
+                -------------------
+                Quest
+                Stage 1: 15
+                F5 H10\s
+                Stage 2: 25
+                F15 S10\s
+                Stage 3: 35
+                F15 D5 B15\s
+                Stage 4: 55
+                F40 B15\s
+                -------------------\n""", quest.toString());
+
+        // Assert that the quest is valid
+        assertEquals(4, quest.stages.size());
+        assertTrue(quest.isStageValid(0));
+        assertTrue(quest.isStageValid(1));
+        assertTrue(quest.isStageValid(2));
+        assertTrue(quest.isStageValid(3));
+
+        // Assert stage values and card selections
+        assertEquals(15, quest.stages.get(0).getValue());
+        assertEquals(25, quest.stages.get(1).getValue());
+        assertEquals(35, quest.stages.get(2).getValue());
+        assertEquals(55, quest.stages.get(3).getValue());
+    }
+
 
     void rigInitialHands() {
         Player p1 = game.players.get(0);
@@ -461,6 +530,18 @@ class MainTest {
             p3.addCard(game.adventureDeck.removeCard(new Card(values3[i], types3[i])));
             p4.addCard(game.adventureDeck.removeCard(new Card(values4[i], types4[i])));
         }
+    }
+
+    Player rigPLayer1Hands() {
+        Player p = game.players.get(0);
+
+        int[] values = {5, 5, 15, 15, 40, 5, 10, 10, 10, 15, 15, 30};
+        String[] types = {"F", "F", "F", "F", "F", "D", "S", "H", "H", "B", "B", "E"};
+
+        for (int i = 0; i < values.length; i++) {
+            p.addCard(new Card(values[i], types[i]));
+        }
+        return p;
     }
 
 }

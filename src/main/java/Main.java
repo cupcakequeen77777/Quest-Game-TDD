@@ -1,5 +1,4 @@
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -15,7 +14,8 @@ public class Main {
     final int numberPlayers = 4;
     int playerTurn = 0;
     int sponsorCount = 0;
-    Card quest = null;
+    Card questCard = null;
+    Quest quest = null;
 
     Deck adventureDeck = new Deck(50);
     Deck eventDeck = new Deck(50);
@@ -41,7 +41,7 @@ public class Main {
     public int GetNumberWeapons() {
         int count = 0;
         for (Card card : adventureDeck.getDeck()) {
-            if (!Objects.equals(card.GetCardType(), "F")) {
+            if (!Objects.equals(card.GetType(), "F")) {
                 count++;
             }
         }
@@ -51,7 +51,7 @@ public class Main {
     private int GetNumberOfType(String type, Deck deck) {
         int count = 0;
         for (Card card : deck.getDeck()) {
-            if (Objects.equals(card.GetCardType(), type)) {
+            if (Objects.equals(card.GetType(), type)) {
                 count++;
             }
         }
@@ -215,7 +215,7 @@ public class Main {
         sponsorCount++;
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         if (sponsorCount >= numberPlayers) {
-            discardDeck.add(quest);
+            discardDeck.add(questCard);
             quest = null;
             playerTurn = nextPlayer();
             sponsorCount = 0;
@@ -235,7 +235,7 @@ public class Main {
                 resolveEvent(newCard);
                 break;
             case "Q":
-                quest = newCard;
+                questCard = newCard;
                 break;
         }
 
@@ -275,6 +275,17 @@ public class Main {
 
     public void displayHand(PrintWriter output, int playerIndex) {
         output.print(players.get(playerIndex).hand + "\n");
+    }
+
+    public Quest sponsorSetsUpQuest(Player sponsor, Quest quest, Scanner input, PrintWriter output) {
+
+        return quest;
+    }
+
+    public Stage buildStage(Quest quest, Player sponsor, int stageIndex, Scanner input, PrintWriter output) {
+        Stage stage = new Stage();
+        boolean stageIsValid = false;
+        return stage;
     }
 
 }
