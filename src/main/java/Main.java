@@ -278,6 +278,21 @@ public class Main {
     }
 
     public Quest sponsorSetsUpQuest(Player sponsor, Quest quest, Scanner input, PrintWriter output) {
+        for (int i = 0; i < quest.numStages; i++) {
+            buildStage(quest, sponsor, i, input, output);
+        }
+
+        // Check if all stages are valid
+        if (quest.stages.size() == quest.numStages) {
+            // Quest is ready to be resolved
+            System.out.println("Quest setup successful!");
+        } else {
+            System.out.println("Quest setup failed: Insufficient stages.");
+        }
+
+        output.flush();
+
+        output.println(quest);
 
         return quest;
     }
@@ -285,6 +300,40 @@ public class Main {
     public Stage buildStage(Quest quest, Player sponsor, int stageIndex, Scanner input, PrintWriter output) {
         Stage stage = new Stage();
         boolean stageIsValid = false;
+        quest.addStage(stage);
+
+        while (true) {
+            String userInput = PromptInput(input, output, "\nSponsor, choose a card for stage " + (stageIndex + 1));
+            output.flush();
+            if (userInput.equalsIgnoreCase("quit") && stageIsValid) {
+                break;
+            } else if (userInput.equalsIgnoreCase("quit")) {
+                output.print("Insufficient value for this stage.\n");
+                continue;
+            }
+
+            int cardIndex = readCardInput(userInput);
+
+            if (cardIndex >= 0 && cardIndex < sponsor.hand.size()) {
+                Card card = sponsor.hand.removeCard(cardIndex);
+
+                // Validate card type (foe or weapon) and uniqueness within the stage
+                if (stage.isValidCard(card)) {
+                    stage.addCard(card);
+                    stage.value = stage.calculateValue();
+
+                    if (quest.isStageValid(stageIndex)) {
+                        stageIsValid = true;
+                    } else {
+                        output.print("Insufficient value for this stage.\n");
+                    }
+                } else {
+                    output.print("Invalid card selection.\n");
+                }
+            } else {
+                System.out.println("Invalid card index.");
+            }
+        }
         return stage;
     }
 
