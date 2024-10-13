@@ -5,11 +5,13 @@ public class Quest {
     List<Stage> stages;
     int numStages;
     boolean isCompleted;
+    List<Player> players;
 
     public Quest(int numStages) {
         this.numStages = numStages;
         stages = new ArrayList<>(numStages);
         isCompleted = false;
+        players = new ArrayList<>();
     }
 
     public void addStage(Stage stage) {

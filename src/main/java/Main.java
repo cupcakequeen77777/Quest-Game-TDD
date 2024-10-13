@@ -18,7 +18,8 @@ public class Main {
     Deck adventureDeck = new Deck(50);
     Deck eventDeck = new Deck(50);
     ArrayList<Player> players = new ArrayList<>(numberPlayers);
-    Deck discardDeck = new Deck(100);
+    Deck adventureDiscardDeck = new Deck(50);
+    Deck eventDiscardDeck = new Deck(50);
 
     public Deck getAdventureDeck() {
         return adventureDeck;
@@ -199,33 +200,30 @@ public class Main {
         }
     }
 
-    /*
-    Output: player number if found sponsor, if all players decline -2, if current player declines -1
-     */
-    public int requestSponsorship(Scanner input, PrintWriter output, int player) {
-        String prompt = "Player " + (player + 1) + " do you want to sponsor (y/N): ";
-        String response = PromptInput(input, output, prompt);
-        if (response.equalsIgnoreCase("y")) {  // Prompt the current player to sponsor the quest.
-            players.get(player).sponsor = true;
-            return player;
-        }
-        sponsorCount++;
-        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-        if (sponsorCount >= numberPlayers) {
-            discardDeck.add(questCard);
-            quest = null;
+
+    public boolean requestSponsorships(Scanner input, PrintWriter output) {
+        for (int i = 0; i < numberPlayers; i++) {
+            String prompt = "Player " + ((playerTurn + 1) + " do you want to sponsor (y/N): ");
+            String response = PromptInput(input, output, prompt);
+            if (response.equalsIgnoreCase("y")) {  // Prompt the current player to sponsor the quest.
+                players.get((i % numberPlayers)).sponsor = true;
+                return true;
+            }
             playerTurn = nextPlayer();
-            sponsorCount = 0;
-            return -2;
+            output.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         }
-        return -1;// Continue this process until a player agrees to sponsor or all players decline.
+        eventDiscardDeck.add(questCard);
+        quest = null;
+
+        return false;// Continue this process until a player agrees to sponsor or all players decline.
     }
+
 
     public int nextPlayer() {
         return (playerTurn + 1) % numberPlayers;
     }
 
-    public int startTurn(PrintWriter output, Card newCard) {
+    public void startTurn(PrintWriter output, Card newCard) {
         output.print("Current player: " + players.get(playerTurn).playerNumber);
         switch (newCard.type) {
             case "E":
@@ -235,8 +233,6 @@ public class Main {
                 questCard = newCard;
                 break;
         }
-
-        return playerTurn;
     }
 
     public String PromptInput(Scanner input, PrintWriter output, String prompt) {
@@ -266,7 +262,7 @@ public class Main {
     public void trimPlayerCard(int cardIndex, int playerIndex) {
         Card discard = players.get(playerIndex).removeCard(cardIndex);
         if (discard != null) {
-            discardDeck.add(discard);
+            adventureDiscardDeck.add(discard);
         }
     }
 
@@ -274,10 +270,10 @@ public class Main {
         output.print(players.get(playerIndex).hand + "\n");
     }
 
-    public Quest sponsorSetsUpQuest(Player sponsor, Quest q, Scanner input, PrintWriter output) {
-        quest = q;
+    public Quest sponsorSetsUpQuest(Player sponsor, Scanner input, PrintWriter output) {
+        quest = new Quest(questCard.cardValue);
         for (int i = 0; i < quest.numStages; i++) {
-            buildStage(quest, sponsor, i, input, output);
+            buildStage(sponsor, i, input, output);
         }
 
         // Check if all stages are valid
@@ -295,63 +291,52 @@ public class Main {
         return quest;
     }
 
-    public Stage buildStage(Quest quest, Player sponsor, int stageIndex, Scanner input, PrintWriter output) {
+    public Stage buildStage(Player sponsor, int stageIndex, Scanner input, PrintWriter output) {
         Stage stage = new Stage();
         boolean stageIsValid = false;
         quest.addStage(stage);
 
         while (true) {
-            String userInput = PromptInput(input, output, "\nSponsor, choose a card for stage " + (stageIndex + 1));
+            displayHand(output, playerTurn);
+            String userInput = PromptInput(input, output, "Sponsor, choose a card for stage " + (stageIndex + 1) + ": ");
             output.flush();
             if (userInput.equalsIgnoreCase("quit") && stageIsValid) {
+                output.print("\n\n");
                 break;
             } else if (userInput.equalsIgnoreCase("quit")) {
                 output.print("\nInsufficient value for this stage.\n");
                 continue;
             }
 
+            output.print(userInput + "\n");
+
             int cardIndex = readCardInput(userInput);
 
             if (cardIndex >= 0 && cardIndex < sponsor.hand.size()) {
                 Card card = sponsor.hand.removeCard(cardIndex);
-
                 // Validate card type (foe or weapon) and uniqueness within the stage
-                if (stage.isValidCard(card)) {
+                if (card != null && stage.isValidCard(card)) {
                     stage.addCard(card);
                     stage.value = stage.calculateValue();
+                    output.print("Selected: " + card + "\n\n");
 
                     if (quest.isStageValid(stageIndex)) {
                         stageIsValid = true;
-                    } else {
-                        output.print("Insufficient value for this stage.\n");
                     }
                 } else {
                     output.print("Invalid card selection.\n");
                 }
             } else {
-                System.out.println("Invalid card index.");
+                output.println("Invalid card index.");
             }
         }
         return stage;
     }
 
-    /*
-    function determineEligibleParticipants(stageIndex) {
-      eligibleParticipants = []
-
-      for each player in quest.participants {
-        if player.hasJoinedQuest() && !player.isEliminated() && meetsStageRequirements(player, stageIndex) {
-          eligibleParticipants.add(player)
-        }
-      }
-
-      displayEligibleParticipants(eligibleParticipants)
-    }
-     */
-    ArrayList<Player> eligibleParticipants(PrintWriter output){
+    ArrayList<Player> eligibleParticipants(PrintWriter output) {
         ArrayList<Player> eligibleParticipants = new ArrayList<>();
         for (Player player : players) {
-            if(player.playerNumber != playerTurn && quest.numStages <= player.countFoes()){
+            if (player.playerNumber != playerTurn && quest.numStages <= player.countFoes()) {
                 eligibleParticipants.add(player);
             }
         }

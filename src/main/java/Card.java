@@ -4,6 +4,18 @@ public class Card {
     int cardValue;
     String type;
 
+    public class Event extends Card {
+        public Event() {
+
+        }
+    }
+
+    public class Adventure extends Card {
+        public Adventure() {
+
+        }
+    }
+
     public Card() {
         new Card(0, "");
     }
