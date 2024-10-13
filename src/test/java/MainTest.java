@@ -1,5 +1,6 @@
 
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,11 @@ import static org.mockito.Mockito.when;
 
 class MainTest {
     static Main game;
+
+    @AfterEach
+    void tearDown() {
+        game = null;
+    }
 
     @BeforeEach
     void initAll() {
@@ -310,7 +316,7 @@ class MainTest {
         Card quest = new Card(1, "Q");
         StringWriter output = new StringWriter();
         game.startTurn(new PrintWriter(output), quest);
-        assertEquals(quest, game.quest);
+        assertEquals(quest, game.questCard);
     }
 
     @Test
@@ -337,7 +343,7 @@ class MainTest {
         assertEquals("Player 4 do you want to sponsor (y/N): ", output.toString());
         assertFalse(game.players.get(3).sponsor);
 
-        input = "n\n";
+        input = "y\n";
         output = new StringWriter();
         game.requestSponsorship(new Scanner(input), new PrintWriter(output), game.playerTurn);
         game.playerTurn = game.nextPlayer();
@@ -421,8 +427,8 @@ class MainTest {
     void RESP_09_test_04() {
         int cardIndex = 3;
         int playerIndex = 0;
-
         game.distributeCards();
+        rigInitialHands();
         Card card = new Card(5, "F");
         game.players.get(playerIndex).addCard(card);
 
@@ -440,7 +446,7 @@ class MainTest {
     @DisplayName("Test single stage")
     void RESP_10_test_01() {
         // Create a sponsor, quest, and hand with valid cards
-        Player sponsor = rigPLayer1Hands();
+        Player sponsor = rigPLayer2Hands();
         sponsor.hand.sort();
         System.out.println(sponsor.hand);
         Quest quest = new Quest(3); // Assuming a 3-stage quest
@@ -457,9 +463,9 @@ class MainTest {
 
     @Test
     @DisplayName("Test valid quest setup with multiple stages")
-    void RESP_10_test_03() {
+    void RESP_10_test_02() {
         // Create a sponsor, quest, and hand with valid cards
-        Player sponsor = rigPLayer1Hands();
+        Player sponsor = rigPLayer2Hands();
         Quest quest = new Quest(4); // Assuming a 4-stage quest
         sponsor.hand.sort();
 
@@ -532,7 +538,7 @@ class MainTest {
         }
     }
 
-    Player rigPLayer1Hands() {
+    Player rigPLayer2Hands() {
         Player p = game.players.get(0);
 
         int[] values = {5, 5, 15, 15, 40, 5, 10, 10, 10, 15, 15, 30};
@@ -543,5 +549,36 @@ class MainTest {
         }
         return p;
     }
+
+    @Test
+    @DisplayName("Game determines and displays eligible participants for each stage")
+    void RESP_11_test_01() {
+        game.distributeCards();
+        rigInitialHands();
+        // Create a sponsor, quest, and hand with valid cards
+        Player sponsor = game.players.get(1);
+        Quest quest = new Quest(4); // Assuming a 4-stage quest
+        sponsor.hand.sort();
+
+        // Simulate user input to select the valid cards
+        StringWriter output = new StringWriter();
+
+        Scanner mockScanner = mock(Scanner.class);
+        when(mockScanner.nextLine()).
+                thenReturn("0", "6", "quit").
+                thenReturn("1", "4", "quit").
+                thenReturn("1", "2", "3", "quit").
+                thenReturn("1", "2", "quit");
+
+        game.sponsorSetsUpQuest(sponsor, quest, mockScanner, new PrintWriter(output));
+
+        output = new StringWriter();
+
+        game.eligibleParticipants(new PrintWriter(output));
+
+        assertEquals("[1, 3, 4]", output.toString());
+        
+    }
+
 
 }

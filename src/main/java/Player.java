@@ -46,5 +46,14 @@ public class Player {
         return 0;
     }
 
+    public int countFoes(){
+        int foeCounter = 0;
+        return foeCounter;
+    }
+
+    public String toString(){
+        return playerNumber + "";
+    }
+
 
 }
