@@ -48,6 +48,12 @@ public class Player {
 
     public int countFoes(){
         int foeCounter = 0;
+        for(int i = 0; i < hand.size(); i++){
+            if(hand.getCard(i).isFoe()){
+                foeCounter++;
+            }
+
+        }
         return foeCounter;
     }
 

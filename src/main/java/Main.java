@@ -3,8 +3,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class Main {
     public static void main(String[] args) {
         System.out.print("Adventure Game!");
@@ -209,7 +207,6 @@ public class Main {
         String response = PromptInput(input, output, prompt);
         if (response.equalsIgnoreCase("y")) {  // Prompt the current player to sponsor the quest.
             players.get(player).sponsor = true;
-            System.out.println("Quest Setup");
             return player;
         }
         sponsorCount++;
@@ -277,7 +274,8 @@ public class Main {
         output.print(players.get(playerIndex).hand + "\n");
     }
 
-    public Quest sponsorSetsUpQuest(Player sponsor, Quest quest, Scanner input, PrintWriter output) {
+    public Quest sponsorSetsUpQuest(Player sponsor, Quest q, Scanner input, PrintWriter output) {
+        quest = q;
         for (int i = 0; i < quest.numStages; i++) {
             buildStage(quest, sponsor, i, input, output);
         }
@@ -285,9 +283,9 @@ public class Main {
         // Check if all stages are valid
         if (quest.stages.size() == quest.numStages) {
             // Quest is ready to be resolved
-            System.out.println("Quest setup successful!");
+            output.println("Quest setup successful!");
         } else {
-            System.out.println("Quest setup failed: Insufficient stages.");
+            output.println("Quest setup failed: Insufficient stages.");
         }
 
         output.flush();
@@ -308,7 +306,7 @@ public class Main {
             if (userInput.equalsIgnoreCase("quit") && stageIsValid) {
                 break;
             } else if (userInput.equalsIgnoreCase("quit")) {
-                output.print("Insufficient value for this stage.\n");
+                output.print("\nInsufficient value for this stage.\n");
                 continue;
             }
 
@@ -335,6 +333,30 @@ public class Main {
             }
         }
         return stage;
+    }
+
+    /*
+    function determineEligibleParticipants(stageIndex) {
+      eligibleParticipants = []
+
+      for each player in quest.participants {
+        if player.hasJoinedQuest() && !player.isEliminated() && meetsStageRequirements(player, stageIndex) {
+          eligibleParticipants.add(player)
+        }
+      }
+
+      displayEligibleParticipants(eligibleParticipants)
+    }
+     */
+    ArrayList<Player> eligibleParticipants(PrintWriter output){
+        ArrayList<Player> eligibleParticipants = new ArrayList<>();
+        for (Player player : players) {
+            if(player.playerNumber != playerTurn && quest.numStages <= player.countFoes()){
+                eligibleParticipants.add(player);
+            }
+        }
+        output.print(eligibleParticipants);
+        return eligibleParticipants;
     }
 
 }
