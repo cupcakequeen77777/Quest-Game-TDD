@@ -344,4 +344,10 @@ public class Main {
         return eligibleParticipants;
     }
 
+    ArrayList<Player> participateInQuest(Scanner input, PrintWriter output) {
+        ArrayList<Player> participants = new ArrayList<>();
+        output.print(participants);
+        return participants;
+    }
+
 }

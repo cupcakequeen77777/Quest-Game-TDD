@@ -3,12 +3,12 @@ import java.util.List;
 
 public class Stage {
     Card foeCard;
-    List<Card> weaponCards;
+    Deck weaponCards;
     int value;
 
     public Stage() {
         foeCard = null;
-        weaponCards = new ArrayList<>();
+        weaponCards = new Deck(20);
         value = 0;
     }
 
@@ -18,6 +18,7 @@ public class Stage {
                 foeCard = card;
             } else if (card.isWeapon()) {
                 weaponCards.add(card);
+                weaponCards.sort();
             } else {
                 // Handle invalid card type
                 throw new IllegalArgumentException("Invalid card type: " + card.type);
@@ -43,7 +44,7 @@ public class Stage {
         if (foeCard != null && card.equals(foeCard)) {
             return false;
         }
-        for (Card weapon : weaponCards) {
+        for (Card weapon : weaponCards.getDeck()) {
             if (card.equals(weapon)) {
                 return false;
             }
@@ -56,14 +57,14 @@ public class Stage {
         if (foeCard != null) {
             value = foeCard.getValue();
         }
-        for (Card weapon : weaponCards) {
+        for (Card weapon : weaponCards.getDeck()) {
             value += weapon.getValue();
         }
         return value;
     }
 
     public boolean isComplete(){
-        return foeCard != null && !weaponCards.isEmpty();
+        return foeCard != null && !weaponCards.getDeck().isEmpty();
     }
 
 
@@ -76,7 +77,7 @@ public class Stage {
         StringBuilder str = new StringBuilder();
         str.append(value);
         str.append("\n").append(foeCard).append(" ");
-        for (Card weaponCard : weaponCards) {
+        for (Card weaponCard : weaponCards.getDeck()) {
             str.append(weaponCard.toString()).append(" ");
         }
         return str.toString();

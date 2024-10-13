@@ -540,7 +540,6 @@ class MainTest {
         // Create a sponsor, quest, and hand with valid cards
         Player sponsor = game.players.get(1);
         game.questCard = new Card(4, "Q");
-        sponsor.hand.sort();
 
         // Simulate user input to select the valid cards
         StringWriter output = new StringWriter();
@@ -560,6 +559,60 @@ class MainTest {
 
         assertEquals("[1, 3, 4]", output.toString());
 
+    }
+
+    @Test
+    @DisplayName("Game prompts participants to withdraw or tackle the current stage")
+    void RESP_12_test_01() {
+        Quest quest = new Quest(4);
+        game.distributeCards();
+        rigInitialHands();
+        rigQuest(quest);
+        System.out.println(quest);
+
+        StringWriter output = new StringWriter();
+        game.eligibleParticipants(new PrintWriter(output));
+        System.out.println(output);
+
+        Scanner mockScanner = mock(Scanner.class);
+        output = new StringWriter();
+        when(mockScanner.nextLine()).
+                thenReturn("y", "y", "n");
+        game.participateInQuest(mockScanner, new PrintWriter(output));
+
+        System.out.println(output);
+        assertTrue(output.toString().contains("[1, 3]"));
+
+    }
+
+    public void rigQuest(Quest quest) {
+        Stage stage = new Stage();
+        Player p2 = game.players.get(1);
+        System.out.println(p2.hand);
+        stage.foeCard = p2.hand.removeCard(new Card(5, "F"));
+        stage.weaponCards.add(p2.hand.removeCard(new Card(10, "H")));
+        stage.calculateValue();
+        quest.stages.add(stage);
+
+        stage = new Stage();
+        stage.foeCard = p2.hand.removeCard(new Card(15, "F"));
+        stage.weaponCards.add(p2.hand.removeCard(new Card(10, "S")));
+        stage.calculateValue();
+        quest.stages.add(stage);
+
+        stage = new Stage();
+        stage.foeCard = p2.hand.removeCard(new Card(15, "F"));
+        stage.weaponCards.add(p2.hand.removeCard(new Card(5, "D")));
+        stage.weaponCards.add(p2.hand.removeCard(new Card(15, "B")));
+        stage.calculateValue();
+        quest.stages.add(stage);
+
+        stage = new Stage();
+        stage.foeCard = p2.hand.removeCard(new Card(40, "F"));
+        stage.weaponCards.add(p2.hand.removeCard(new Card(15, "B")));
+        stage.calculateValue();
+        quest.stages.add(stage);
+        game.quest = quest;
     }
 
 
