@@ -35,7 +35,7 @@ class MainTest {
         initializeGame(mockScanner, output);
     }
 
-    public void initializeGame(Scanner input,StringWriter output){
+    public void initializeGame(Scanner input, StringWriter output) {
         game = new Main(input, new PrintWriter(output));
         game.InitializeAdventureDeck();
         game.InitializeEventDeck();
@@ -466,8 +466,6 @@ class MainTest {
     }
 
 
-
-
     @Test
     @DisplayName("Test single stage")
     void RESP_10_test_01() {
@@ -628,7 +626,34 @@ class MainTest {
 
     }
 
+    @Test
+    @DisplayName("Each participating players draw an Adventure Card")
+    void RESP_13_test_01() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
 
+        Quest quest = new Quest(4);
+        game.distributeCards();
+        rigInitialHands();
+        rigQuest(quest);
+
+        game.eligibleParticipants();
+
+        when(mockScanner.nextLine()).
+                thenReturn("y", "y", "n");
+        game.participateInQuest();
+
+        when(mockScanner.nextLine()).
+                thenReturn("0", "1", "2");
+        game.startStage();
+
+        assertTrue(game.players.get(0).hand.size() <= 12);
+        assertTrue(game.players.get(1).hand.size() <= 12);
+        assertTrue(game.players.get(2).hand.size() <= 12);
+        assertTrue(game.players.get(3).hand.size() <= 12);
+
+    }
 
 
     public void rigQuest(Quest quest) {
