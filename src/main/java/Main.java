@@ -248,7 +248,6 @@ public class Main {
 
     public String PromptInput(String prompt) {
         output.print(prompt);
-        output.flush();
         return input.nextLine();
     }
 
@@ -261,19 +260,9 @@ public class Main {
         return cardIndex;
     }
 
-    public ArrayList<Integer> numberCardsToTrim() {
-        ArrayList<Integer> numberCardsToTrim = new ArrayList<>();
+    public void trimCards() {
         for (Player player : players) {
-            numberCardsToTrim.add(player.numberToTrim());
-        }
-        return numberCardsToTrim;
-    }
 
-
-    public void trimPlayerCard(int cardIndex, int playerIndex) {
-        Card discard = players.get(playerIndex).removeCard(cardIndex);
-        if (discard != null) {
-            adventureDiscardDeck.add(discard);
         }
     }
 

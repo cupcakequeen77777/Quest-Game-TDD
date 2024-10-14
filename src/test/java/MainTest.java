@@ -397,18 +397,59 @@ class MainTest {
         for (int i = 0; i < numberCardsToDraw; i++) {
             game.players.get(0).addCard(game.drawAdventureCard());
         }
-        System.out.println(game.numberCardsToTrim());
-        assertEquals(numberCardsToDraw, game.numberCardsToTrim().get(0));
+        assertEquals(numberCardsToDraw, game.players.get(0).numberToTrim());
+    }
+
+    @Test
+    @DisplayName("If any player has more then 12 cards then they must discard down")
+    void RESP_9_test_02() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+        game.distributeCards();
+
+        int numberCardsToDraw = 2;
+        for (int i = 0; i < numberCardsToDraw; i++) {
+            game.players.get(0).addCard(game.drawAdventureCard());
+        }
+        when(mockScanner.nextLine()).
+                thenReturn("0", "3");
+        game.trimCards();
+
+        assertEquals(12, game.players.get(0).hand.size());
+        assertEquals(12, game.players.get(1).hand.size());
+        assertEquals(12, game.players.get(2).hand.size());
+        assertEquals(12, game.players.get(3).hand.size());
+
+        System.out.println(output);
+
     }
 
     @Test
     @DisplayName("The game displays the hand of the player and prompts the player for the position of the next card to delete")
     void RESP_09_test_02() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
         game.distributeCards();
         int numberCardsToDraw = 2;
+        game.players.get(3).removeCard(0); // Player 4 will have less then 12 cards
         for (int i = 0; i < numberCardsToDraw; i++) {
             game.players.get(0).addCard(game.drawAdventureCard());
+            game.players.get(0).addCard(game.drawAdventureCard());
+            game.players.get(1).addCard(game.drawAdventureCard());
         }
+        when(mockScanner.nextLine()).
+                thenReturn("0", "0", "1", "3", "0", "1");
+        game.trimCards();
+
+        assertTrue(game.players.get(0).hand.size() <= 12);
+        assertTrue(game.players.get(1).hand.size() <= 12);
+        assertTrue(game.players.get(2).hand.size() <= 12);
+        assertTrue(game.players.get(3).hand.size() <= 12);
+
+
+        System.out.println(output);
     }
 
     @Test
@@ -424,27 +465,7 @@ class MainTest {
         assertEquals(6, index);
     }
 
-    @Test
-    @DisplayName("The game deletes the card from the player’s hand and displays the trimmed hand")
-    void RESP_09_test_04() {
-        StringWriter output = new StringWriter();
-        Scanner mockScanner = mock(Scanner.class);
-        initializeGame(mockScanner, output);
 
-        int cardIndex = 3;
-        int playerIndex = 0;
-        game.distributeCards();
-        rigInitialHands();
-        Card card = new Card(5, "F");
-        game.players.get(playerIndex).addCard(card);
-
-        game.trimPlayerCard(cardIndex, playerIndex);
-        assertEquals(12, game.players.get(playerIndex).hand.size());
-
-        game.displayHand(playerIndex);
-        assertEquals("[F5, F5, F15, D5, S10, S10, H10, H10, B15, B15, L20, F5]\n", output.toString());
-
-    }
 
 
     @Test
@@ -606,6 +627,8 @@ class MainTest {
         assertTrue(output.toString().contains("[1, 3]"));
 
     }
+
+
 
 
     public void rigQuest(Quest quest) {
