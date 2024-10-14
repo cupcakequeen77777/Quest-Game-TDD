@@ -358,7 +358,7 @@ public class Main {
                 eligibleParticipants.add(player);
             }
         }
-        output.print(eligibleParticipants);
+        output.print(eligibleParticipants + "\n");
     }
 
     public void participateInQuest() {
@@ -374,11 +374,19 @@ public class Main {
                 }
 
             }
+            output.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         }
-        output.print(participants);
+        output.print(participants + "\n");
         quest.stages.get(quest.currentStage).participants = participants;
     }
 
+    public void startStage() {
+        Stage stage = quest.stages.get(quest.currentStage);
+        for (Player participant : stage.participants) {
+            participant.addCard(adventureDeck.drawCard());
+        }
+        trimCards();
 
+    }
 
 }
