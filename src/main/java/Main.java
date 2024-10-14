@@ -234,7 +234,7 @@ public class Main {
         return (playerTurn + 1) % numberPlayers;
     }
 
-    public void startTurn( Card newCard) {
+    public void startTurn(Card newCard) {
         output.print("Current player: " + players.get(playerTurn).playerNumber);
         switch (newCard.type) {
             case "E":
@@ -261,9 +261,27 @@ public class Main {
     }
 
     public void trimCards() {
+        output.flush();
         for (Player player : players) {
+            if (player.numberToTrim() > 0) {
+                output.print("Player " + player.playerNumber + " need to discard " + player.numberToTrim() + " cards\n");
+                while (player.numberToTrim() > 0) {
+                    output.print(player.hand);
+                    output.print("\nChoose a card to discard: ");
+                    String userInput = input.nextLine();
+                    output.print(userInput + "\n");
+                    int cardIndex = readCardInput(input.nextLine());
 
+                    Card card = player.removeCard(cardIndex);
+                    output.print("Discard " + card + "\n\n");
+                    adventureDeck.add(card);
+
+                }
+                displayHand(player.playerNumber-1);
+                output.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+            }
         }
+
     }
 
     public void displayHand(int playerIndex) {
@@ -361,9 +379,6 @@ public class Main {
         quest.stages.get(quest.currentStage).participants = participants;
     }
 
-    public void startStage() {
-        
 
-    }
 
 }
