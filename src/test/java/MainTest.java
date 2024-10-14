@@ -29,7 +29,14 @@ class MainTest {
 
     @BeforeEach
     void initAll() {
-        game = new Main();
+//        game = new Main();
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+    }
+
+    public void initializeGame(Scanner input,StringWriter output){
+        game = new Main(input, new PrintWriter(output));
         game.InitializeAdventureDeck();
         game.InitializeEventDeck();
         game.players.add(new Player(1));
@@ -261,17 +268,19 @@ class MainTest {
     @Test
     @DisplayName("The game indicates whose turn it is and displays this player’s hand")
     void RESP_05_test_02() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
         game.distributeCards();
         rigInitialHands();
         game.playerTurn = 0;
 
         Card quest = new Card(2, "E");
-        StringWriter output = new StringWriter();
-        game.startTurn(new PrintWriter(output), quest);
+        game.startTurn(quest);
         assertEquals("Current player: 1", output.toString());
 
         output = new StringWriter();
-        game.displayHand(new PrintWriter(output), game.playerTurn);
+        game.displayHand(game.playerTurn);
         assertNotNull(output.toString());
     }
 
@@ -312,23 +321,28 @@ class MainTest {
     @Test
     @DisplayName("Game handles the drawing of a Q card")
     void RESP_07_test_01() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
         game.playerTurn = 1;
         Card quest = new Card(1, "Q");
-        StringWriter output = new StringWriter();
-        game.startTurn(new PrintWriter(output), quest);
+        game.startTurn(quest);
         assertEquals(quest, game.questCard);
     }
 
     @Test
     @DisplayName("Game handles quest sponsorship, first player accepts")
     void RESP_07_test_02() {
-        game.playerTurn = 0;
         StringWriter output = new StringWriter();
         Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
+        game.playerTurn = 0;
         when(mockScanner.nextLine()).
                 thenReturn("y");
 
-        game.requestSponsorships(mockScanner, new PrintWriter(output));
+        game.requestSponsorships();
 
         assertTrue(output.toString().contains("Player 1 do you want to sponsor (y/N): "));
         assertTrue(game.players.get(0).sponsor);
@@ -337,14 +351,16 @@ class MainTest {
     @Test
     @DisplayName("Game handles quest sponsorship, second player accepts")
     void RESP_07_test_03() {
-        game.playerTurn = 3;
-
         StringWriter output = new StringWriter();
         Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
+        game.playerTurn = 3;
+
         when(mockScanner.nextLine()).
                 thenReturn("n", "y");
 
-        game.requestSponsorships(mockScanner, new PrintWriter(output));
+        assertTrue(game.requestSponsorships());
 
         assertFalse(game.players.get(3).sponsor);
         assertTrue(game.players.get(0).sponsor);
@@ -354,14 +370,15 @@ class MainTest {
     @Test
     @DisplayName("Game handles the quest sponsorship, everyone declines")
     void RESP_08_test_01() {
-        game.playerTurn = 2;
-
         StringWriter output = new StringWriter();
         Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+        game.playerTurn = 2;
+
         when(mockScanner.nextLine()).
                 thenReturn("n", "n", "n", "n");
 
-        game.requestSponsorships(mockScanner, new PrintWriter(output));
+        game.requestSponsorships();
 
         assertFalse(game.players.get(0).sponsor);
         assertFalse(game.players.get(1).sponsor);
@@ -397,9 +414,12 @@ class MainTest {
     @Test
     @DisplayName("The player enters a valid position")
     void RESP_09_test_03() {
-        String input = "6";
         StringWriter output = new StringWriter();
-        game.PromptInput(new Scanner(input), new PrintWriter(output), "Enter card index of card to discard: ");
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
+        String input = "6";
+        game.PromptInput("Enter card index of card to discard: ");
         int index = game.readCardInput(input);
         assertEquals(6, index);
     }
@@ -407,6 +427,10 @@ class MainTest {
     @Test
     @DisplayName("The game deletes the card from the player’s hand and displays the trimmed hand")
     void RESP_09_test_04() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
         int cardIndex = 3;
         int playerIndex = 0;
         game.distributeCards();
@@ -417,8 +441,7 @@ class MainTest {
         game.trimPlayerCard(cardIndex, playerIndex);
         assertEquals(12, game.players.get(playerIndex).hand.size());
 
-        StringWriter output = new StringWriter();
-        game.displayHand(new PrintWriter(output), playerIndex);
+        game.displayHand(playerIndex);
         assertEquals("[F5, F5, F15, D5, S10, S10, H10, H10, B15, B15, L20, F5]\n", output.toString());
 
     }
@@ -427,41 +450,41 @@ class MainTest {
     @Test
     @DisplayName("Test single stage")
     void RESP_10_test_01() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
         // Create a sponsor, quest, and hand with valid cards
         Player sponsor = rigPLayer2Hands();
         sponsor.hand.sort();
-        System.out.println(sponsor.hand);
+
         game.questCard = new Card(3, "Q");// Assuming a 3-stage quest
+        game.quest = new Quest(game.questCard.cardValue);
 
         // Simulate user input to select the valid cards
-        StringWriter output = new StringWriter();
-
-        Scanner mockScanner = mock(Scanner.class);
         when(mockScanner.nextLine()).thenReturn("0", "5", "quit");
 
-        assertNotNull(game.buildStage(sponsor, 0, mockScanner, new PrintWriter(output)));
+        assertNotNull(game.buildStage(sponsor, 0));
 
     }
 
     @Test
     @DisplayName("Test valid quest setup with multiple stages")
     void RESP_10_test_02() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
         // Create a sponsor, quest, and hand with valid cards
         Player sponsor = rigPLayer2Hands();
         sponsor.hand.sort();
         game.questCard = new Card(4, "Q");
 
-        // Simulate user input to select the valid cards
-        StringWriter output = new StringWriter();
-
-        Scanner mockScanner = mock(Scanner.class);
         when(mockScanner.nextLine()).
                 thenReturn("0", "6", "quit").
                 thenReturn("1", "4", "quit").
                 thenReturn("1", "2", "3", "quit").
                 thenReturn("1", "2", "quit");
 
-        game.sponsorSetsUpQuest(sponsor, mockScanner, new PrintWriter(output));
+        game.sponsorSetsUpQuest(sponsor);
 
         assertEquals("""
                 -------------------
@@ -535,27 +558,29 @@ class MainTest {
     @Test
     @DisplayName("Game determines and displays eligible participants for each stage")
     void RESP_11_test_01() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
         game.distributeCards();
         rigInitialHands();
         // Create a sponsor, quest, and hand with valid cards
         Player sponsor = game.players.get(1);
+        game.playerTurn = 1;
         game.questCard = new Card(4, "Q");
 
         // Simulate user input to select the valid cards
-        StringWriter output = new StringWriter();
-
-        Scanner mockScanner = mock(Scanner.class);
         when(mockScanner.nextLine()).
                 thenReturn("0", "6", "quit").
                 thenReturn("1", "4", "quit").
                 thenReturn("1", "2", "3", "quit").
                 thenReturn("1", "2", "quit");
 
-        game.sponsorSetsUpQuest(sponsor, mockScanner, new PrintWriter(output));
+        game.sponsorSetsUpQuest(sponsor);
 
         output = new StringWriter();
+        game.output = new PrintWriter(output);
 
-        game.eligibleParticipants(new PrintWriter(output));
+        game.eligibleParticipants();
 
         assertEquals("[1, 3, 4]", output.toString());
 
@@ -564,26 +589,24 @@ class MainTest {
     @Test
     @DisplayName("Game prompts participants to withdraw or tackle the current stage")
     void RESP_12_test_01() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
         Quest quest = new Quest(4);
         game.distributeCards();
         rigInitialHands();
         rigQuest(quest);
-        System.out.println(quest);
 
-        StringWriter output = new StringWriter();
-        game.eligibleParticipants(new PrintWriter(output));
-        System.out.println(output);
+        game.eligibleParticipants();
 
-        Scanner mockScanner = mock(Scanner.class);
-        output = new StringWriter();
         when(mockScanner.nextLine()).
                 thenReturn("y", "y", "n");
-        game.participateInQuest(mockScanner, new PrintWriter(output));
-
-        System.out.println(output);
+        game.participateInQuest();
         assertTrue(output.toString().contains("[1, 3]"));
 
     }
+
 
     public void rigQuest(Quest quest) {
         Stage stage = new Stage();

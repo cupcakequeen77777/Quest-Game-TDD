@@ -11,15 +11,26 @@ public class Main {
     final int numberTypesOfFoes = 10;
     final int numberPlayers = 4;
     int playerTurn = 0;
-    int sponsorCount = 0;
     Card questCard = null;
     Quest quest = null;
+    public PrintWriter output;
+    public Scanner input;
 
     Deck adventureDeck = new Deck(50);
     Deck eventDeck = new Deck(50);
     ArrayList<Player> players = new ArrayList<>(numberPlayers);
     Deck adventureDiscardDeck = new Deck(50);
     Deck eventDiscardDeck = new Deck(50);
+
+    public Main() {
+        input = new Scanner(System.in);
+        output = new PrintWriter(System.out, true);
+    }
+
+    public Main(Scanner in, PrintWriter out) {
+        input = in;
+        output = out;
+    }
 
     public Deck getAdventureDeck() {
         return adventureDeck;
@@ -201,12 +212,12 @@ public class Main {
     }
 
 
-    public boolean requestSponsorships(Scanner input, PrintWriter output) {
+    public boolean requestSponsorships() {
         for (int i = 0; i < numberPlayers; i++) {
             String prompt = "Player " + ((playerTurn + 1) + " do you want to sponsor (y/N): ");
-            String response = PromptInput(input, output, prompt);
+            String response = PromptInput(prompt);
             if (response.equalsIgnoreCase("y")) {  // Prompt the current player to sponsor the quest.
-                players.get((i % numberPlayers)).sponsor = true;
+                players.get(playerTurn).sponsor = true;
                 return true;
             }
             playerTurn = nextPlayer();
@@ -223,7 +234,7 @@ public class Main {
         return (playerTurn + 1) % numberPlayers;
     }
 
-    public void startTurn(PrintWriter output, Card newCard) {
+    public void startTurn( Card newCard) {
         output.print("Current player: " + players.get(playerTurn).playerNumber);
         switch (newCard.type) {
             case "E":
@@ -235,7 +246,7 @@ public class Main {
         }
     }
 
-    public String PromptInput(Scanner input, PrintWriter output, String prompt) {
+    public String PromptInput(String prompt) {
         output.print(prompt);
         output.flush();
         return input.nextLine();
@@ -266,14 +277,14 @@ public class Main {
         }
     }
 
-    public void displayHand(PrintWriter output, int playerIndex) {
+    public void displayHand(int playerIndex) {
         output.print(players.get(playerIndex).hand + "\n");
     }
 
-    public Quest sponsorSetsUpQuest(Player sponsor, Scanner input, PrintWriter output) {
+    public Quest sponsorSetsUpQuest(Player sponsor) {
         quest = new Quest(questCard.cardValue);
         for (int i = 0; i < quest.numStages; i++) {
-            buildStage(sponsor, i, input, output);
+            buildStage(sponsor, i);
         }
 
         // Check if all stages are valid
@@ -291,14 +302,14 @@ public class Main {
         return quest;
     }
 
-    public Stage buildStage(Player sponsor, int stageIndex, Scanner input, PrintWriter output) {
+    public Stage buildStage(Player sponsor, int stageIndex) {
         Stage stage = new Stage();
         boolean stageIsValid = false;
         quest.addStage(stage);
 
         while (true) {
-            displayHand(output, playerTurn);
-            String userInput = PromptInput(input, output, "Sponsor, choose a card for stage " + (stageIndex + 1) + ": ");
+            displayHand(playerTurn);
+            String userInput = PromptInput("Sponsor, choose a card for stage " + (stageIndex + 1) + ": ");
             output.flush();
             if (userInput.equalsIgnoreCase("quit") && stageIsValid) {
                 output.print("\n\n");
@@ -333,24 +344,22 @@ public class Main {
         return stage;
     }
 
-    ArrayList<Player> eligibleParticipants(PrintWriter output) {
+    public void eligibleParticipants() {
         ArrayList<Player> eligibleParticipants = new ArrayList<>();
         for (Player player : players) {
-            if (player.playerNumber-1 != playerTurn && quest.numStages <= player.countFoes()) {
+            if (player.playerNumber - 1 != playerTurn && quest.numStages <= player.countFoes()) {
                 eligibleParticipants.add(player);
-
             }
         }
         output.print(eligibleParticipants);
-        return eligibleParticipants;
     }
 
-    ArrayList<Player> participateInQuest(Scanner input, PrintWriter output) {
+    public void participateInQuest() {
         ArrayList<Player> participants = new ArrayList<>();
         for (Player player : players) {
-            if (player.playerNumber != playerTurn-1 && quest.numStages <= player.countFoes()) {
+            if (player.playerNumber != playerTurn - 1 && quest.numStages <= player.countFoes()) {
                 String prompt = "Player " + player.playerNumber + " do you want to participate in the quest (y/N): ";
-                String response = PromptInput(input, output, prompt);
+                String response = PromptInput(prompt);
                 output.print(response + "\n");
                 if (response.equalsIgnoreCase("y")) {
                     participants.add(player);
@@ -360,7 +369,12 @@ public class Main {
             }
         }
         output.print(participants);
-        return participants;
+        quest.stages.get(quest.currentStage).participants = participants;
+    }
+
+    public void startStage() {
+        
+
     }
 
 }

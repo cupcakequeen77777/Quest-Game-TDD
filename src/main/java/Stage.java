@@ -5,11 +5,13 @@ public class Stage {
     Card foeCard;
     Deck weaponCards;
     int value;
+    ArrayList<Player> participants;
 
     public Stage() {
         foeCard = null;
         weaponCards = new Deck(20);
         value = 0;
+        participants = new ArrayList<>();
     }
 
     public void addCard(Card card) {
