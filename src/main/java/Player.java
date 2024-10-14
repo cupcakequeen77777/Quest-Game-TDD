@@ -68,14 +68,62 @@ public class Player {
     }
 
     public int setupAttack(Stage stage, Scanner input, PrintWriter output) {
+        output.print("Player " + playerNumber + " set up your attack.\n");
+
+        while (true) {
+            output.print(hand + "\n");
+            output.print("Select cards for the stage attack: ");
+            String userInput = input.nextLine();
+            output.print(userInput + "\n");
+            output.flush();
+            if (userInput.equalsIgnoreCase("quit") && calculateAttackValue(attack) >= stage.value) {
+                break;
+            } else if (userInput.equalsIgnoreCase("quit")) {
+                output.print("\nInsufficient value for this stage.\n");
+                continue;
+            }
+            int cardIndex = Integer.parseInt(userInput);
+
+            if (cardIndex >= 0 && cardIndex < hand.size()) {
+                Card card = hand.removeCard(cardIndex);
+                // Validate card type (foe or weapon) and uniqueness within the stage
+                if (isValidAttackCard(card)) {
+                    attack.add(card);
+                    output.print("Selected: " + card + "\n");
+
+                } else {
+                    output.print("Invalid card selection.\n");
+                }
+            } else {
+                output.println("Invalid card index.\n");
+            }
+        }
+
+        // Calculate total attack value based on attackDeck
+        attackValue = calculateAttackValue(attack);
+        output.print("Your attack value is " + attackValue);
+        output.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         return attackValue;
 
     }
+
     public boolean isValidAttackCard(Card card) {
+        if (card == null || card.isFoe()) {
             return false;
+        }
+        for (Card a : attack.deck) {
+            if (a.equals(card)) {
+                return false;
+            }
+        }
+        return true;
     }
+
     private int calculateAttackValue(Deck attackDeck) {
         int totalValue = 0;
+        for (Card card : attackDeck.getDeck()) {
+            totalValue += card.getValue();
+        }
         return totalValue;
     }
 

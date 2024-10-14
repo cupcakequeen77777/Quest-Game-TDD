@@ -393,6 +393,8 @@ public class Main {
     public void handleParticipantAttacks() {
         ArrayList<Player> participants = quest.stages.get(quest.currentStage).participants;
 
+        for (Player participant : participants) {
+            participant.attackValue = participant.setupAttack(quest.stages.get(quest.currentStage), input, output);
         }
 
     }
