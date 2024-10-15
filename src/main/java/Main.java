@@ -410,6 +410,12 @@ public class Main {
                     quest.stages.get(quest.currentStage + 1).participants.add(participant);
                 }
             }
+            int cardToDiscard = participant.attack.deck.size();
+            for (int i = 0; i < cardToDiscard; i++) {
+                Card attack = participant.attack.deck.removeFirst();
+                adventureDiscardDeck.add(attack);
+            }
+
         }
         quest.currentStage++;
         output.print("Players continuing the quest: " + quest.stages.get(quest.currentStage).participants);
