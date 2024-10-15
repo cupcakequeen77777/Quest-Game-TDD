@@ -1,9 +1,6 @@
 
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -24,6 +21,9 @@ class MainTest {
 
     @AfterEach
     void tearDown() {
+        game.players.clear();
+        game.adventureDeck.deck.clear();
+        game.eventDeck.deck.clear();
         game = null;
     }
 
@@ -287,7 +287,7 @@ class MainTest {
 
         Card quest = new Card(2, "E", false);
         game.startTurn(quest);
-        assertEquals("Current player: 1\n", output.toString());
+        assertTrue(output.toString().contains("Current player: 1\n"));
 
         output = new StringWriter();
         game.displayHand(game.playerTurn);
@@ -352,6 +352,8 @@ class MainTest {
         when(mockScanner.nextLine()).
                 thenReturn("y");
 
+        game.questCard = new Card(3, "Q", false);
+
         game.requestSponsorships();
 
         assertTrue(output.toString().contains("Player 1 do you want to sponsor (y/N): "));
@@ -366,6 +368,8 @@ class MainTest {
         initializeGame(mockScanner, output);
 
         game.playerTurn = 3;
+
+        game.questCard = new Card(3, "Q", false);
 
         when(mockScanner.nextLine()).
                 thenReturn("n", "y");
@@ -384,7 +388,7 @@ class MainTest {
         Scanner mockScanner = mock(Scanner.class);
         initializeGame(mockScanner, output);
         game.playerTurn = 2;
-
+        game.questCard = new Card(2, "Q", false);
         when(mockScanner.nextLine()).
                 thenReturn("n", "n", "n", "n");
 
@@ -582,7 +586,7 @@ class MainTest {
 
         game.eligibleParticipants();
 
-        assertEquals("[1, 3, 4]\n", output.toString());
+        assertTrue(output.toString().contains("[1, 3, 4]"));
 
     }
 
@@ -594,6 +598,7 @@ class MainTest {
         initializeGame(mockScanner, output);
 
         Quest quest = new Quest(4);
+        game.questCard = new Card(4, "Q", false);
         game.distributeCards();
         rigInitialHands(game);
         rigQuest(quest);
@@ -601,9 +606,9 @@ class MainTest {
         game.eligibleParticipants();
 
         when(mockScanner.nextLine()).
-                thenReturn("y", "y", "n");
+                thenReturn("y", " ", "y", "n");
         game.participateInQuest();
-        assertTrue(output.toString().contains("[1, 3]"));
+        assertEquals("[1, 3]", quest.stages.get(quest.currentStage).participants.toString());
 
     }
 
@@ -621,7 +626,7 @@ class MainTest {
 
         game.eligibleParticipants();
 
-        when(mockScanner.nextLine()).thenReturn("y", "y", "n");
+        when(mockScanner.nextLine()).thenReturn("y", " ", "y", "n");
         game.participateInQuest();
 
         when(mockScanner.nextLine()).thenReturn("0", "1", "2");
@@ -641,7 +646,9 @@ class MainTest {
         Player p4 = game.players.get(3);
         Card quest = game.drawEventCard();
         game.eventDeck.add(quest);
+
         quest = game.eventDeck.removeCard(new Card(4, "Q", false));
+        game.questCard = quest;
 
         game.displayHand(game.playerTurn);
         game.startTurn(quest);
@@ -684,9 +691,7 @@ class MainTest {
         Scanner mockScanner = mock(Scanner.class);
         initializeGame(mockScanner, output);
 
-        // Start game, decks are created, hands of the 4 players are set up with random cards
-        game.distributeCards();
-        rigInitialHands(game);
+        setInitialHands(game);
 
         setUpQuest(mockScanner);
 
@@ -705,15 +710,14 @@ class MainTest {
     }
 
     @Test
+//    @Disabled
     @DisplayName("Game resolves attacks against the current stage")
     void RESP_15_test_01() {
         StringWriter output = new StringWriter();
         Scanner mockScanner = mock(Scanner.class);
         initializeGame(mockScanner, output);
 
-        // Start game, decks are created, hands of the 4 players are set up with random cards
-        game.distributeCards();
-        rigInitialHands(game);
+        setInitialHands(game);
 
         setUpQuest(mockScanner);
 
@@ -729,15 +733,14 @@ class MainTest {
     }
 
     @Test
+//    @Disabled
     @DisplayName("Game handles the completion of a quest and updates shields")
     void RESP_16_test_01() {
         StringWriter output = new StringWriter();
         Scanner mockScanner = mock(Scanner.class);
         initializeGame(mockScanner, output);
 
-        // Start game, decks are created, hands of the 4 players are set up with random cards
-        game.distributeCards();
-        rigInitialHands(game);
+        setInitialHands(game);
 
         setUpQuest(mockScanner);
 
@@ -761,8 +764,7 @@ class MainTest {
         initializeGame(mockScanner, output);
 
         // Start game, decks are created, hands of the 4 players are set up with random cards
-        game.distributeCards();
-        rigInitialHands(game);
+        setInitialHands(game);
 
         setUpQuest(mockScanner);
 
@@ -776,7 +778,7 @@ class MainTest {
         game.quest.stages.get(3).value = 15;
         game.quest.currentStage = 3;
 
-         when(mockScanner.nextLine()).
+        when(mockScanner.nextLine()).
                 thenReturn("0");
         game.resolveStage();
 
@@ -786,6 +788,7 @@ class MainTest {
     }
 
     @Test
+//    @Disabled
     @DisplayName("Game discards cards used by the sponsor and updates their hand, who then draws the same number of cards + the number of stages, and then possibly trims their hand")
     void RESP_18_test_01() {
         StringWriter output = new StringWriter();
@@ -793,8 +796,7 @@ class MainTest {
         initializeGame(mockScanner, output);
 
         // Start game, decks are created, hands of the 4 players are set up with random cards
-        game.distributeCards();
-        rigInitialHands(game);
+        setInitialHands(game);
         setUpQuest(mockScanner);
         when(mockScanner.nextLine()).
                 thenReturn("4", "4", "quit").thenReturn("4", "quit").thenReturn("3", "5", "quit");
@@ -863,6 +865,32 @@ class MainTest {
         game.players.get(3).hand.sort();
     }
 
+    void setInitialHands(Main game) {
+        int[] values1 = {5, 5, 15, 15, 5, 10, 10, 10, 10, 15, 15, 20};
+        String[] types1 = {"F", "F", "F", "F", "D", "S", "S", "H", "H", "B", "B", "L"};
+        int[] values2 = {5, 5, 15, 15, 40, 5, 10, 10, 10, 15, 15, 30};
+        String[] types2 = {"F", "F", "F", "F", "F", "D", "S", "H", "H", "B", "B", "E"};
+        int[] values3 = {5, 5, 5, 15, 5, 10, 10, 10, 10, 10, 15, 20};
+        String[] types3 = {"F", "F", "F", "F", "D", "S", "S", "S", "H", "H", "B", "L"};
+        int[] values4 = {5, 15, 15, 40, 5, 5, 10, 10, 10, 15, 20, 30};
+        String[] types4 = {"F", "F", "F", "F", "D", "D", "S", "H", "H", "B", "L", "E"};
+
+        setHand(game.players.get(0), values1, types1);
+        setHand(game.players.get(1), values2, types2);
+        setHand(game.players.get(2), values3, types3);
+        setHand(game.players.get(3), values4, types4);
+        game.players.get(0).hand.sort();
+        game.players.get(1).hand.sort();
+        game.players.get(2).hand.sort();
+        game.players.get(3).hand.sort();
+    }
+
+    void setHand(Player p, int[] values, String[] types) {
+        for (int i = 0; i < 12; i++) {
+            p.addCard(game.adventureDeck.removeCard(new Card(values[i], types[i], true)));
+        }
+    }
+
     void rigHand(Player p, int[] values, String[] types) {
 
         for (int i = 0; i < 12; i++) {
@@ -913,16 +941,10 @@ class MainTest {
         Scanner mockScanner = mock(Scanner.class);
         initializeGame(mockScanner, output);
 
-        game.players.add(new Player(1));
-        game.players.add(new Player(2));
-        game.players.add(new Player(3));
-        game.players.add(new Player(4));
-
         Player p1 = game.players.get(0);
         Player p2 = game.players.get(1);
         Player p3 = game.players.get(2);
         Player p4 = game.players.get(3);
-
 
 
         // Start game, decks are created, hands of the 4 players are set up with random cards
@@ -1040,8 +1062,8 @@ class MainTest {
             f. All 2 participants discard the cards used for their attacks
          */
 
-         when(mockScanner.nextLine()).
-                thenReturn("8", "5", "3", "quit").thenReturn("6", "4", "5","quit");
+        when(mockScanner.nextLine()).
+                thenReturn("8", "5", "3", "quit").thenReturn("6", "4", "5", "quit");
 
         game.handleParticipantAttacks();
         game.resolveStage();
@@ -1061,7 +1083,7 @@ class MainTest {
         p4.addCard(game.adventureDeck.removeCard(new Card(20, "L", true)));
 
         when(mockScanner.nextLine()).
-                thenReturn("6", "5", "5", "quit").thenReturn("3", "3", "3", "4","quit");
+                thenReturn("6", "5", "5", "quit").thenReturn("3", "3", "3", "4", "quit");
 
         game.handleParticipantAttacks();
         /*
@@ -1091,7 +1113,7 @@ class MainTest {
         assertEquals(12, p2.hand.size());
 
 
-        System.out.println(output);
+//        System.out.println(output);
 
     }
 

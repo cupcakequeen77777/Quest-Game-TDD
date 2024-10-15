@@ -23,12 +23,14 @@ public class Main {
         game.eventDeck.shuffle();
         game.distributeCards();
 
-        while(!game.checkForWinner()) {
+
+        while (!game.checkForWinner()) {
+
             Card newCard = game.drawEventCard();
 
             game.startTurn(newCard);
 
-            if(newCard.type.equals("Q")) {
+            if (newCard.type.equals("Q")) {
                 game.displayHand(game.playerTurn);
 
                 Card quest = newCard;
@@ -38,8 +40,6 @@ public class Main {
                 game.questCard = quest;
 
                 game.displayHand(game.playerTurn);
-
-                game.startTurn(quest);
 
                 game.requestSponsorships();
 
@@ -61,6 +61,8 @@ public class Main {
                         break;
                     }
                 }
+            } else {
+
             }
             System.out.print("Winners: " + game.getWinners());
             System.out.println(output);
@@ -257,23 +259,32 @@ public class Main {
         Player currentPlayer = players.get(playerTurn);
         switch (newCard.cardValue) {
             case 1: // Plague: current player loses 2 shields
+                System.out.print("Lose 2 shields\n");
+                output.print("Lose 2 shields\n");
                 currentPlayer.plague();
                 break;
             case 2: // Queen’s favor: current player draws 2 adventure cards and possibly trims their hand (UC-03)
+                System.out.print("Draw 2 adventure cards\n");
+                output.print("Draw 2 adventure cards\n");
                 currentPlayer.addCard(drawAdventureCard());
                 currentPlayer.addCard(drawAdventureCard());
                 currentPlayer.hand.sort();
+                trimCards();
                 break;
             case 3: // Prosperity: All players draw 2 adventure cards and each of them possibly trims their hand (UC-03)
+                System.out.print("Everyone draws 2 adventure cards\n");
+                output.print("Everyone draws 2 adventure cards\n");
                 for (Player player : players) {
                     player.addCard(drawAdventureCard());
                     player.addCard(drawAdventureCard());
                     currentPlayer.hand.sort();
+                    trimCards();
                 }
 
                 break;
 
         }
+        playerTurn = nextPlayer();
     }
 
 
@@ -283,14 +294,14 @@ public class Main {
         for (int i = 0; i < numberPlayers; i++) {
             String prompt = "Player " + ((playerTurn + 1) + " do you want to sponsor (y/N): ");
             String response = PromptInput(prompt);
-            System.out.println(response + "\n");
+            System.out.print(response + "\n");
             output.print(response + "\n");
             if (response.equalsIgnoreCase("y")) {  // Prompt the current player to sponsor the quest.
                 players.get(playerTurn).sponsor = true;
                 return true;
             }
             playerTurn = nextPlayer();
-            output.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
         }
         eventDiscardDeck.add(questCard);
         quest = null;
@@ -300,13 +311,19 @@ public class Main {
 
 
     public int nextPlayer() {
+        System.out.println("Press <Enter> to end your turn");
+        output.println("Press <Enter> to end your turn");
+        input.nextLine();
+        output.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
         return (playerTurn + 1) % numberPlayers;
     }
 
     public void startTurn(Card newCard) {
         System.out.println("Current player: " + players.get(playerTurn).playerNumber + "\n");
         output.print("Current player: " + players.get(playerTurn).playerNumber + "\n");
-        System.out.println(newCard);
+        System.out.println("Drew: " + newCard);
         output.println(newCard);
         switch (newCard.type) {
             case "E":
@@ -319,7 +336,7 @@ public class Main {
     }
 
     public String PromptInput(String prompt) {
-        System.out.println(prompt);
+        System.out.print(prompt);
         output.print(prompt);
         return input.nextLine();
     }
@@ -336,36 +353,35 @@ public class Main {
     public void trimCards() {
         output.flush();
         for (Player player : players) {
+            int count = player.numberToTrim();
             if (player.numberToTrim() > 0) {
                 System.out.println("Player " + player.playerNumber + " need to discard " + player.numberToTrim() + " cards\n");
                 output.print("Player " + player.playerNumber + " need to discard " + player.numberToTrim() + " cards\n");
-                while (player.numberToTrim() > 0) {
-                    System.out.println(player.hand);
-                    System.out.println("\nChoose a card to discard: ");
-                    output.print(player.hand);
+                for (int i = 0; i < count; i++) {
+                    System.out.print(player.handToString());
+                    output.print(player.handToString());
+                    System.out.print("\nChoose a card to discard: ");
                     output.print("\nChoose a card to discard: ");
-                    String userInput = input.nextLine();
-                    output.print(userInput + "\n");
 
-                    int cardIndex = readCardInput(input.nextLine());
+                    int cardIndex = input.nextInt();
+                    output.print(cardIndex + "\n");
 
                     Card card = player.removeCard(cardIndex);
                     System.out.println("Discard " + card + "\n\n");
                     output.print("Discard " + card + "\n\n");
                     adventureDeck.add(card);
-
                 }
+
                 displayHand(player.playerNumber - 1);
-                System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-                output.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                nextPlayer();
             }
         }
 
     }
 
     public void displayHand(int playerIndex) {
-        System.out.println(players.get(playerIndex).hand + "\n");
-        output.print(players.get(playerIndex).hand + "\n");
+        System.out.println("Hand: " + players.get(playerIndex).handToString() + "\n");
+        output.print("Hand: " + players.get(playerIndex).handToString() + "\n");
     }
 
     public Quest sponsorSetsUpQuest(Player sponsor) {
@@ -397,8 +413,10 @@ public class Main {
 
         while (true) {
             displayHand(playerTurn);
-            String userInput = PromptInput("Sponsor, choose a card for stage " + (stageIndex + 1) + ": ");
+            String userInput = PromptInput("Sponsor, choose a card for stage " + (stageIndex + 1) + "/" + quest.numStages + ": ");
             output.flush();
+            System.out.print(userInput);
+            output.print(userInput);
             if (userInput.equalsIgnoreCase("quit") && stageIsValid) {
                 System.out.println("\n\n");
                 output.print("\n\n");
@@ -408,8 +426,6 @@ public class Main {
                 output.print("\nInsufficient value for this stage.\n");
                 continue;
             }
-            System.out.println(userInput + "\n");
-            output.print(userInput + "\n");
 
             int cardIndex = readCardInput(userInput);
 
@@ -419,13 +435,14 @@ public class Main {
                 if (card != null && stage.isValidCard(card)) {
                     stage.addCard(card);
                     stage.value = stage.calculateValue();
-                    System.out.println("Selected: " + card + "\n\n");
-                    output.print("Selected: " + card + "\n\n");
+                    System.out.print("\nSelected: " + card + "\n\n");
+                    output.print("\nSelected: " + card + "\n\n");
 
                     if (quest.isStageValid(stageIndex)) {
                         stageIsValid = true;
                     }
                 } else {
+                    sponsor.hand.add(card);
                     System.out.println("Invalid card selection.\n");
                     output.print("Invalid card selection.\n");
                 }
@@ -449,8 +466,7 @@ public class Main {
         } else {
             eligibleParticipants = quest.stages.get(quest.currentStage).participants;
         }
-        System.out.println(eligibleParticipants + "\n");
-        output.print(eligibleParticipants + "\n");
+        output.print("Eligible Participants: " + eligibleParticipants + "\n");
         return eligibleParticipants;
     }
 
@@ -458,22 +474,20 @@ public class Main {
         ArrayList<Player> eligibleParticipants = eligibleParticipants();
         ArrayList<Player> participants = eligibleParticipants();
         for (Player player : eligibleParticipants) {
-            if (player.playerNumber != playerTurn - 1) { //  && quest.numStages <= player.countFoes()
-                String prompt = "Player " + player.playerNumber + " do you want to participate in the quest (y/N): ";
+            if (player.playerNumber != playerTurn - 1) {
+                System.out.print(player.handToString());
+                output.print(player.handToString());
+                String prompt = "\nPlayer " + player.playerNumber + " do you want to participate in the quest (y/N): ";
                 String response = PromptInput(prompt);
                 System.out.println(response + "\n");
                 output.print(response + "\n");
                 if (response.equalsIgnoreCase("n")) {
                     participants.remove(player);
-
                 }
 
             }
-            System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-            output.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+            nextPlayer();
         }
-        System.out.println(participants + "\n");
-        output.print(participants + "\n");
         quest.stages.get(quest.currentStage).participants = participants;
     }
 
@@ -486,16 +500,12 @@ public class Main {
         System.out.println();
     }
 
-    public void stage() {
-
-    }
-
 
     public void handleParticipantAttacks() {
         ArrayList<Player> participants = quest.stages.get(quest.currentStage).participants;
 
         for (Player participant : participants) {
-            participant.attackValue = participant.setupAttack(quest.stages.get(quest.currentStage), input, output);
+            participant.attackValue = participant.setupAttack(input, output);
         }
 
     }
@@ -504,7 +514,7 @@ public class Main {
         if (quest.numStages - 1 == quest.currentStage) {
             quest.stages.add(new Stage());
         }
-//        for (Player participant : quest.stages.get(quest.currentStage).participants) {
+
         for (int i = 0; i < quest.stages.get(0).participants.size(); i++) {
             Player participant = quest.stages.get(0).participants.get(i);
 

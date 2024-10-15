@@ -5,10 +5,6 @@ public class Card {
     String type;
     boolean weapon;
 
-    public Card() {
-        new Card(0, "", false);
-    }
-
     public Card(int value, String t, boolean w) {
         cardValue = value;
         type = t;
@@ -25,7 +21,16 @@ public class Card {
 
     @Override
     public String toString() {
-        if(isFoe() || !weapon){
+        if (isFoe() || !weapon) {
+            if (type.equals("E")) {
+                if (cardValue == 1) {
+                    return "Plague";
+                } else if (cardValue == 2) {
+                    return "Queen’s favor";
+                } else {
+                    return "Prosperity";
+                }
+            }
             return type + cardValue;
         }
         switch (type) {
@@ -66,11 +71,11 @@ public class Card {
         return cardValue == card.cardValue && type.equals(card.type);
     }
 
-    public boolean isWeapon(){
-        return !type.equals("F") && !type.equals("E")  && !type.equals("Q");
+    public boolean isWeapon() {
+        return !type.equals("F") && !type.equals("E") && !type.equals("Q");
     }
 
-    public boolean isFoe(){
+    public boolean isFoe() {
         return type.equals("F");
     }
 

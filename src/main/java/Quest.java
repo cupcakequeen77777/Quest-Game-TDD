@@ -28,21 +28,21 @@ public class Quest {
     public boolean isStageValid(int stageIndex) {
         if (stageIndex == 0 && stages.get(stageIndex).isComplete()) { // First stage
             return true; // Only check for non-emptiness
-        } else if(stageIndex == 0){
+        } else if (stageIndex == 0) {
             return false;
         }
         return !stages.get(stageIndex).isEmpty() && stages.get(stageIndex).getValue() > stages.get(stageIndex - 1).getValue();
     }
 
-    public int countCardsUsed(){
+    public int countCardsUsed() {
         int count = 0;
-        for(Stage stage : stages){
+        for (Stage stage : stages) {
             count += stage.weaponCards.size() + 1; // number of weapon cards and one foe card per stage
         }
         return count;
     }
 
-    public String toString(){
+    public String toString() {
         StringBuilder str = new StringBuilder();
         str.append("-------------------\n");
         str.append("Quest\n");

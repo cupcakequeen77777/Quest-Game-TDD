@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 
 public class Deck {
     ArrayList<Card> deck;
@@ -16,10 +13,6 @@ public class Deck {
         return deck;
     }
 
-    public int getCardLimit() {
-        return cardLimit;
-    }
-
     public boolean isEmpty() {
         return deck.isEmpty();
     }
@@ -30,11 +23,11 @@ public class Deck {
 
     public Card removeCard(Card x) {
         for (int i = 0; i < deck.size(); i++) {
-            if(deck.get(i).equals(x)) {
+            if (deck.get(i).equals(x)) {
                 return deck.remove(i);
             }
         }
-        return null;
+        return new Card(1000, "Q", true);
     }
 
     public Card removeCard(int index) {
@@ -65,12 +58,11 @@ public class Deck {
     }
 
     public void sort() {
-        if(deck.size()>=2) {
-            deck.sort(new CardComparator());
-        }
+        deck.sort(new CardComparator());
     }
 
     public int size() {
+        deck.removeAll(Arrays.asList("", null));
         return deck.size();
     }
 
@@ -80,11 +72,18 @@ public class Deck {
     }
 
     static class CardComparator implements Comparator<Card> {
-        // Overriding compare()method of Comparator
         @Override
         public int compare(Card c1, Card c2) {
-            return c1.compare(c2);
+            if (c1 == null) {
+                return c2 == null ? 0 : 1; // Null is lower
+            } else if (c2 == null) {
+                return -1; // Non-null is higher
+            } else {
+                return c1.compare(c2);
+            }
         }
+
+
     }
 
 }

@@ -1,4 +1,6 @@
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Player {
@@ -32,16 +34,12 @@ public class Player {
         }
     }
 
-    // TODO: add card to deck
     public void addCard(Card card) {
         hand.add(card);
-        if(hand.size() > 1){
+        hand.deck.removeAll(Arrays.asList("", null));
+        if (hand.size() > 1) {
             hand.sort();
         }
-    }
-
-    public Card drawCard() {
-        return hand.drawCard();
     }
 
     public Card removeCard(int index) {
@@ -55,28 +53,17 @@ public class Player {
         return 0;
     }
 
-    public int countFoes() {
-        int foeCounter = 0;
-        for (int i = 0; i < hand.size(); i++) {
-            if (hand.getCard(i).isFoe()) {
-                foeCounter++;
-            }
-
-        }
-        return foeCounter;
-    }
-
     public String toString() {
         return playerNumber + "";
     }
 
-    public int setupAttack(Stage stage, Scanner input, PrintWriter output) {
+    public int setupAttack(Scanner input, PrintWriter output) {
         output.print("Player " + playerNumber + " set up your attack.\n");
         System.out.println("Player " + playerNumber + " set up your attack.\n");
 
         while (true) {
-            System.out.println(hand + "\n" + "Select cards for the stage attack: ");
-            output.print(hand + "\n");
+            System.out.println(handToString() + "\n" + "Select cards for the stage attack: ");
+            output.print(handToString() + "\n");
             output.print("Select cards for the stage attack: ");
             String userInput = input.nextLine();
             System.out.println(userInput + "\n");
@@ -107,12 +94,24 @@ public class Player {
 
         // Calculate total attack value based on attackDeck
         attackValue = calculateAttackValue(attack);
-        System.out.println("Your attack value is " + attackValue + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        System.out.println("Your attack value is " + attackValue);
         output.print("Your attack value is " + attackValue);
-        output.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
+//        System.out.println("Press <Enter> to end your turn");
+//        output.println("Press <Enter> to end your turn");
+//        input.nextLine();
+//        output.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+//        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+//        System.out.println("Press <Enter> to start your turn");
+//        output.println("Press <Enter> to start your turn");
+//        input.nextLine();
+//        output.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+//        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
         return attackValue;
 
     }
+
 
     public boolean isValidAttackCard(Card card) {
         if (card == null || card.isFoe()) {
@@ -134,9 +133,10 @@ public class Player {
         return totalValue;
     }
 
-    public String handToString(){
+    public String handToString() {
+        hand.sort();
         StringBuilder builder = new StringBuilder();
-        for(Card card: hand.deck){
+        for (Card card : hand.deck) {
             builder.append(card).append(" ");
         }
         return builder.toString();

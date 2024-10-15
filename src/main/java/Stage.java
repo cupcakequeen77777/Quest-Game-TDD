@@ -65,7 +65,7 @@ public class Stage {
         return value;
     }
 
-    public boolean isComplete(){
+    public boolean isComplete() {
         return foeCard != null && !weaponCards.getDeck().isEmpty();
     }
 
