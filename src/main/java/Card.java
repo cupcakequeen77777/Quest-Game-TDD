@@ -1,28 +1,18 @@
-
+import java.util.Objects;
 
 public class Card {
     int cardValue;
     String type;
-
-    public class Event extends Card {
-        public Event() {
-
-        }
-    }
-
-    public class Adventure extends Card {
-        public Adventure() {
-
-        }
-    }
+    boolean weapon;
 
     public Card() {
-        new Card(0, "");
+        new Card(0, "", false);
     }
 
-    public Card(int value, String t) {
+    public Card(int value, String t, boolean w) {
         cardValue = value;
         type = t;
+        weapon = w;
     }
 
     public int getValue() {
@@ -35,7 +25,31 @@ public class Card {
 
     @Override
     public String toString() {
-        return type + cardValue;
+        if(isFoe() || !weapon){
+            return type + cardValue;
+        }
+        switch (type) {
+            case "D" -> {
+                return "Dagger";
+            }
+            case "H" -> {
+                return "Horse";
+            }
+            case "S" -> {
+                return "Sword";
+            }
+            case "B" -> {
+                return "Axe";
+            }
+            case "L" -> {
+                return "Lance";
+            }
+            case "E" -> {
+                return "Excalibur";
+            }
+        }
+
+        return "";
     }
 
     // TODO: Displaying the hand of a player means listing foes first in increasing order, then weapons, also in increasing order, with swords before horses.

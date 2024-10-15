@@ -1,4 +1,5 @@
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -91,7 +92,7 @@ public class Main {
 
         for (int i = 0; i < numberTypesOfFoes; i++) {
             for (int j = 0; j < numberFoes[i]; j++) {
-                newCard = new Card(value[i], "F");
+                newCard = new Card(value[i], "F", true);
                 adventureDeck.add(newCard);
 
             }
@@ -99,11 +100,10 @@ public class Main {
 
         for (int i = 0; i < numberWeaponTypes; i++) {
             for (int j = 0; j < numberWeapons[i]; j++) {
-                newCard = new Card(wValue[i], wType[i]);
+                newCard = new Card(wValue[i], wType[i], true);
                 adventureDeck.add(newCard);
             }
         }
-        adventureDeck.shuffle();
 
     }
 
@@ -115,7 +115,7 @@ public class Main {
 
         for (int i = 0; i < numberTypesOfQuests; i++) {
             for (int j = 0; j < numberQuests[i]; j++) {
-                newCard = new Card(value[i], "Q");
+                newCard = new Card(value[i], "Q", false);
                 eventDeck.add(newCard);
             }
         }
@@ -126,7 +126,7 @@ public class Main {
 
         for (int i = 0; i < numberTypesOfEvents; i++) {
             for (int j = 0; j < numberEvents[i]; j++) {
-                newCard = new Card(eValue[i], "E");
+                newCard = new Card(eValue[i], "E", false);
                 eventDeck.add(newCard);
             }
         }
@@ -149,7 +149,7 @@ public class Main {
     }
 
     public Card drawAdventureCard() {
-        if(adventureDeck.isEmpty()){
+        if (adventureDeck.isEmpty()) {
             adventureDeck.addAll(adventureDiscardDeck.removeAll());
             adventureDeck.shuffle();
         }
@@ -188,7 +188,7 @@ public class Main {
     }
 
     public Card drawEventCard() {
-        if(eventDeck.isEmpty()){
+        if (eventDeck.isEmpty()) {
             eventDeck.addAll(eventDiscardDeck.removeAll());
             eventDeck.shuffle();
         }
@@ -204,11 +204,13 @@ public class Main {
             case 2: // Queen’s favor: current player draws 2 adventure cards and possibly trims their hand (UC-03)
                 currentPlayer.addCard(drawAdventureCard());
                 currentPlayer.addCard(drawAdventureCard());
+                currentPlayer.hand.sort();
                 break;
             case 3: // Prosperity: All players draw 2 adventure cards and each of them possibly trims their hand (UC-03)
                 for (Player player : players) {
                     player.addCard(drawAdventureCard());
                     player.addCard(drawAdventureCard());
+                    currentPlayer.hand.sort();
                 }
 
                 break;
@@ -359,12 +361,18 @@ public class Main {
     }
 
     public ArrayList<Player> eligibleParticipants() {
-        ArrayList<Player> eligibleParticipants = new ArrayList<>();
-        for (Player player : players) {
-            if (player.playerNumber - 1 != playerTurn) {
-                eligibleParticipants.add(player);
+        ArrayList<Player> eligibleParticipants;
+        if (quest.currentStage == 0) {
+            eligibleParticipants = new ArrayList<>();
+            for (Player player : players) {
+                if (player.playerNumber - 1 != playerTurn) {
+                    eligibleParticipants.add(player);
+                }
             }
+        } else {
+            eligibleParticipants = quest.stages.get(quest.currentStage).participants;
         }
+
         output.print(eligibleParticipants + "\n");
         return eligibleParticipants;
     }
@@ -393,6 +401,7 @@ public class Main {
         Stage stage = quest.stages.get(quest.currentStage);
         for (Player participant : stage.participants) {
             participant.addCard(adventureDeck.drawCard());
+            participant.hand.sort();
         }
         System.out.println();
     }
@@ -438,6 +447,7 @@ public class Main {
             for (int i = 0; i < quest.countCardsUsed() + quest.numStages; i++) {
                 quest.sponsor.addCard(adventureDeck.drawCard());
             }
+            quest.sponsor.hand.sort();
             trimCards();
             for (Stage stage : quest.stages) {
                 adventureDiscardDeck.add(stage.foeCard);

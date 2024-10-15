@@ -35,7 +35,9 @@ public class Player {
     // TODO: add card to deck
     public void addCard(Card card) {
         hand.add(card);
-        hand.sort();
+        if(hand.size() > 1){
+            hand.sort();
+        }
     }
 
     public Card drawCard() {
@@ -123,6 +125,14 @@ public class Player {
             totalValue += card.getValue();
         }
         return totalValue;
+    }
+
+    public String handToString(){
+        StringBuilder builder = new StringBuilder();
+        for(Card card: hand.deck){
+            builder.append(card).append(" ");
+        }
+        return builder.toString();
     }
 
 

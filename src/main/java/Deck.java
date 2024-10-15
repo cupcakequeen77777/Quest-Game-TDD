@@ -65,7 +65,9 @@ public class Deck {
     }
 
     public void sort() {
-        deck.sort(new CardComparator());
+        if(deck.size()>=2) {
+            deck.sort(new CardComparator());
+        }
     }
 
     public int size() {
