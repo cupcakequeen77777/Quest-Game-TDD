@@ -72,11 +72,14 @@ public class Player {
 
     public int setupAttack(Stage stage, Scanner input, PrintWriter output) {
         output.print("Player " + playerNumber + " set up your attack.\n");
+        System.out.println("Player " + playerNumber + " set up your attack.\n");
 
         while (true) {
+            System.out.println(hand + "\n" + "Select cards for the stage attack: ");
             output.print(hand + "\n");
             output.print("Select cards for the stage attack: ");
             String userInput = input.nextLine();
+            System.out.println(userInput + "\n");
             output.print(userInput + "\n");
             output.flush();
             if (userInput.equalsIgnoreCase("quit")) {
@@ -89,18 +92,22 @@ public class Player {
                 // Validate card type (foe or weapon) and uniqueness within the stage
                 if (isValidAttackCard(card)) {
                     attack.add(card);
+                    System.out.println("Selected: " + card + "\n");
                     output.print("Selected: " + card + "\n");
 
                 } else {
+                    System.out.println("Invalid card selection.\n");
                     output.print("Invalid card selection.\n");
                 }
             } else {
+                System.out.println("Invalid card index.\n");
                 output.println("Invalid card index.\n");
             }
         }
 
         // Calculate total attack value based on attackDeck
         attackValue = calculateAttackValue(attack);
+        System.out.println("Your attack value is " + attackValue + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         output.print("Your attack value is " + attackValue);
         output.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         return attackValue;

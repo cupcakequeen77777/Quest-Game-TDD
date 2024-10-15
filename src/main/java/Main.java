@@ -6,7 +6,65 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.print("Adventure Game!");
+        Scanner input = new Scanner(System.in);
+        StringWriter output = new StringWriter();
+        PrintWriter out = new PrintWriter(output);
+        Main game = new Main(input, out);
+
+        game.players.add(new Player(1));
+        game.players.add(new Player(2));
+        game.players.add(new Player(3));
+        game.players.add(new Player(4));
+
+        // Start game, decks are created, hands of the 4 players are set up with random cards
+        game.InitializeAdventureDeck();
+        game.InitializeEventDeck();
+        game.adventureDeck.shuffle();
+        game.eventDeck.shuffle();
+        game.distributeCards();
+
+        while(!game.checkForWinner()) {
+            Card newCard = game.drawEventCard();
+
+            game.startTurn(newCard);
+
+            if(newCard.type.equals("Q")) {
+                game.displayHand(game.playerTurn);
+
+                Card quest = newCard;
+
+                game.eventDeck.add(quest);
+
+                game.questCard = quest;
+
+                game.displayHand(game.playerTurn);
+
+                game.startTurn(quest);
+
+                game.requestSponsorships();
+
+                game.sponsorSetsUpQuest(game.players.get(game.playerTurn));
+
+                while (true) {
+
+                    game.eligibleParticipants();
+
+                    game.participateInQuest();
+
+                    game.startStage();
+
+                    game.trimCards();
+
+                    game.handleParticipantAttacks();
+                    game.resolveStage();
+                    if (game.quest.currentStage >= game.quest.numStages || game.quest.stages.get(game.quest.currentStage).participants.isEmpty()) {
+                        break;
+                    }
+                }
+            }
+            System.out.print("Winners: " + game.getWinners());
+            System.out.println(output);
+        }
     }
 
     final int numberTypesOfFoes = 10;
@@ -220,9 +278,12 @@ public class Main {
 
 
     public boolean requestSponsorships() {
+        System.out.println("Quest of " + questCard.cardValue + " stages");
+        output.println("Quest of " + questCard.cardValue + " stages");
         for (int i = 0; i < numberPlayers; i++) {
             String prompt = "Player " + ((playerTurn + 1) + " do you want to sponsor (y/N): ");
             String response = PromptInput(prompt);
+            System.out.println(response + "\n");
             output.print(response + "\n");
             if (response.equalsIgnoreCase("y")) {  // Prompt the current player to sponsor the quest.
                 players.get(playerTurn).sponsor = true;
@@ -243,7 +304,10 @@ public class Main {
     }
 
     public void startTurn(Card newCard) {
+        System.out.println("Current player: " + players.get(playerTurn).playerNumber + "\n");
         output.print("Current player: " + players.get(playerTurn).playerNumber + "\n");
+        System.out.println(newCard);
+        output.println(newCard);
         switch (newCard.type) {
             case "E":
                 resolveEvent(newCard);
@@ -255,6 +319,7 @@ public class Main {
     }
 
     public String PromptInput(String prompt) {
+        System.out.println(prompt);
         output.print(prompt);
         return input.nextLine();
     }
@@ -272,20 +337,26 @@ public class Main {
         output.flush();
         for (Player player : players) {
             if (player.numberToTrim() > 0) {
+                System.out.println("Player " + player.playerNumber + " need to discard " + player.numberToTrim() + " cards\n");
                 output.print("Player " + player.playerNumber + " need to discard " + player.numberToTrim() + " cards\n");
                 while (player.numberToTrim() > 0) {
+                    System.out.println(player.hand);
+                    System.out.println("\nChoose a card to discard: ");
                     output.print(player.hand);
                     output.print("\nChoose a card to discard: ");
                     String userInput = input.nextLine();
                     output.print(userInput + "\n");
+
                     int cardIndex = readCardInput(input.nextLine());
 
                     Card card = player.removeCard(cardIndex);
+                    System.out.println("Discard " + card + "\n\n");
                     output.print("Discard " + card + "\n\n");
                     adventureDeck.add(card);
 
                 }
                 displayHand(player.playerNumber - 1);
+                System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 output.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
             }
         }
@@ -293,6 +364,7 @@ public class Main {
     }
 
     public void displayHand(int playerIndex) {
+        System.out.println(players.get(playerIndex).hand + "\n");
         output.print(players.get(playerIndex).hand + "\n");
     }
 
@@ -328,13 +400,15 @@ public class Main {
             String userInput = PromptInput("Sponsor, choose a card for stage " + (stageIndex + 1) + ": ");
             output.flush();
             if (userInput.equalsIgnoreCase("quit") && stageIsValid) {
+                System.out.println("\n\n");
                 output.print("\n\n");
                 break;
             } else if (userInput.equalsIgnoreCase("quit")) {
+                System.out.println("\nInsufficient value for this stage.\n");
                 output.print("\nInsufficient value for this stage.\n");
                 continue;
             }
-
+            System.out.println(userInput + "\n");
             output.print(userInput + "\n");
 
             int cardIndex = readCardInput(userInput);
@@ -345,15 +419,18 @@ public class Main {
                 if (card != null && stage.isValidCard(card)) {
                     stage.addCard(card);
                     stage.value = stage.calculateValue();
+                    System.out.println("Selected: " + card + "\n\n");
                     output.print("Selected: " + card + "\n\n");
 
                     if (quest.isStageValid(stageIndex)) {
                         stageIsValid = true;
                     }
                 } else {
+                    System.out.println("Invalid card selection.\n");
                     output.print("Invalid card selection.\n");
                 }
             } else {
+                System.out.println("Invalid card index.");
                 output.println("Invalid card index.");
             }
         }
@@ -372,7 +449,7 @@ public class Main {
         } else {
             eligibleParticipants = quest.stages.get(quest.currentStage).participants;
         }
-
+        System.out.println(eligibleParticipants + "\n");
         output.print(eligibleParticipants + "\n");
         return eligibleParticipants;
     }
@@ -384,6 +461,7 @@ public class Main {
             if (player.playerNumber != playerTurn - 1) { //  && quest.numStages <= player.countFoes()
                 String prompt = "Player " + player.playerNumber + " do you want to participate in the quest (y/N): ";
                 String response = PromptInput(prompt);
+                System.out.println(response + "\n");
                 output.print(response + "\n");
                 if (response.equalsIgnoreCase("n")) {
                     participants.remove(player);
@@ -391,8 +469,10 @@ public class Main {
                 }
 
             }
+            System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
             output.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         }
+        System.out.println(participants + "\n");
         output.print(participants + "\n");
         quest.stages.get(quest.currentStage).participants = participants;
     }
@@ -442,6 +522,7 @@ public class Main {
         }
 
         if (quest.numStages - 1 == quest.currentStage) {
+            System.out.println("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants + "\n");
             output.print("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants + "\n");
             // draws the same number of cards + the number of stages, and then possibly trims their hand
             for (int i = 0; i < quest.countCardsUsed() + quest.numStages; i++) {
@@ -457,6 +538,7 @@ public class Main {
             }
         } else {
             quest.currentStage++;
+            System.out.println("Players continuing the quest: " + quest.stages.get(quest.currentStage).participants);
             output.print("Players continuing the quest: " + quest.stages.get(quest.currentStage).participants);
         }
 
