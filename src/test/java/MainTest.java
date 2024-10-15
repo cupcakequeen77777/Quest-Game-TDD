@@ -694,8 +694,33 @@ class MainTest {
 
         System.out.println(output);
 
+    }
+
+    @Test
+    @DisplayName("Game resolves attacks against the current stage")
+    void RESP_15_test_01() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
+        // Start game, decks are created, hands of the 4 players are set up with random cards
+        game.InitializeAdventureDeck();
+        game.InitializeEventDeck();
+        game.distributeCards();
+        rigInitialHands(game);
+
+        setUpQuest(mockScanner);
 
 
+        when(mockScanner.nextLine()).
+                thenReturn("4", "4", "quit").thenReturn("4", "quit").thenReturn("3", "5", "quit");
+//                thenReturn("4", "4", "quit").thenReturn("4", "3", "quit").thenReturn("3", "5", "quit");
+        game.handleParticipantAttacks();
+
+
+        game.resolveStage();
+        System.out.println(output);
+        assertTrue(output.toString().contains("Players continuing the quest: [1, 4]"));
     }
 
     void rigInitialHands(Main game) {
