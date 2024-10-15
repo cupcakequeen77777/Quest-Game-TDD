@@ -781,6 +781,35 @@ class MainTest {
         assertEquals(4, game.players.get(3).shields);
     }
 
+    @Test
+    @DisplayName("Game discards cards used by the sponsor and updates their hand, who then draws the same number of cards + the number of stages, and then possibly trims their hand")
+    void RESP_18_test_01() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
+        // Start game, decks are created, hands of the 4 players are set up with random cards
+        game.InitializeAdventureDeck();
+        game.InitializeEventDeck();
+        game.distributeCards();
+        rigInitialHands(game);
+        setUpQuest(mockScanner);
+        when(mockScanner.nextLine()).
+                thenReturn("4", "4", "quit").thenReturn("4", "quit").thenReturn("3", "5", "quit");
+        game.handleParticipantAttacks();
+
+        game.quest.stages.get(3).participants = game.quest.stages.get(game.quest.currentStage).participants;
+        game.quest.stages.get(3).value = 15;
+        game.quest.currentStage = 3;
+
+        when(mockScanner.nextLine()).
+                thenReturn("0");
+        game.resolveStage();
+
+        assertEquals(12, game.players.get(1).hand.size());
+
+    }
+
     void rigInitialHands(Main game) {
         int[] values1 = {5, 5, 15, 15, 5, 10, 10, 10, 10, 15, 15, 20};
         String[] types1 = {"F", "F", "F", "F", "D", "S", "S", "H", "H", "B", "B", "L"};
