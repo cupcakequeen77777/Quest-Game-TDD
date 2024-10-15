@@ -149,6 +149,10 @@ public class Main {
     }
 
     public Card drawAdventureCard() {
+        if(adventureDeck.isEmpty()){
+            adventureDeck.addAll(adventureDiscardDeck.removeAll());
+            adventureDeck.shuffle();
+        }
         return adventureDeck.drawCard();
     }
 
@@ -184,6 +188,10 @@ public class Main {
     }
 
     public Card drawEventCard() {
+        if(eventDeck.isEmpty()){
+            eventDeck.addAll(eventDiscardDeck.removeAll());
+            eventDeck.shuffle();
+        }
         return eventDeck.drawCard();
     }
 
@@ -420,7 +428,7 @@ public class Main {
                 }
                 quest.stages.get(quest.currentStage + 1).participants.add(participant);
             }
-            adventureDiscardDeck.add(participant.attack);
+            adventureDiscardDeck.addAll(participant.attack);
             participant.attack.removeAll();
         }
 
@@ -434,7 +442,7 @@ public class Main {
             for (Stage stage : quest.stages) {
                 adventureDiscardDeck.add(stage.foeCard);
                 stage.foeCard = null;
-                adventureDiscardDeck.add(stage.weaponCards);
+                adventureDiscardDeck.addAll(stage.weaponCards);
                 stage.weaponCards.removeAll();
             }
         } else {

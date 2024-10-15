@@ -20,6 +20,10 @@ public class Deck {
         return cardLimit;
     }
 
+    public boolean isEmpty() {
+        return deck.isEmpty();
+    }
+
     public Card getCard(int i) {
         return deck.get(i);
     }
@@ -37,16 +41,19 @@ public class Deck {
         return deck.remove(index);
     }
 
-    public void removeAll() {
+    public Deck removeAll() {
+        Deck d = new Deck(cardLimit);
+        d.deck = deck;
         deck = new ArrayList<>();
+        return d;
     }
 
     public void add(Card card) {
         deck.add(card);
     }
 
-    public void add(Deck d) {
-        deck.addAll(d.getDeck());
+    public void addAll(Deck d) {
+        deck = d.getDeck();
     }
 
     public Card drawCard() {
