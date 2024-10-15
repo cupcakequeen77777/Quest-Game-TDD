@@ -76,11 +76,8 @@ public class Player {
             String userInput = input.nextLine();
             output.print(userInput + "\n");
             output.flush();
-            if (userInput.equalsIgnoreCase("quit") && calculateAttackValue(attack) >= stage.value) {
+            if (userInput.equalsIgnoreCase("quit")) {
                 break;
-            } else if (userInput.equalsIgnoreCase("quit")) {
-                output.print("\nInsufficient value for this stage.\n");
-                continue;
             }
             int cardIndex = Integer.parseInt(userInput);
 
