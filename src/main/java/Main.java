@@ -388,6 +388,10 @@ public class Main {
         System.out.println();
     }
 
+    public void stage() {
+
+    }
+
 
     public void handleParticipantAttacks() {
         ArrayList<Player> participants = quest.stages.get(quest.currentStage).participants;
@@ -399,28 +403,40 @@ public class Main {
     }
 
     public void resolveStage() {
-        for (Player participant : quest.stages.get(quest.currentStage).participants) {
+        if(quest.numStages - 1 == quest.currentStage){
+            quest.stages.add(new Stage());
+        }
+//        for (Player participant : quest.stages.get(quest.currentStage).participants) {
+        for (int i = 0; i < quest.stages.get(0).participants.size(); i++) {
+            Player participant = quest.stages.get(0).participants.get(i);
+
             // participants with an attack equal or greater to the value of the current stage are eligible for the next stage
             if (participant.attackValue >= quest.stages.get(quest.currentStage).value) {
 
                 // If this is the last stage, they are winners of this quest and earn as many shields as there are stages to this quest.
-                if (quest.numStages == quest.currentStage) {
+                if (quest.numStages - 1 == quest.currentStage) {
                     participant.shields += quest.numStages;
-                } else {
-                    quest.stages.get(quest.currentStage + 1).participants.add(participant);
                 }
+                quest.stages.get(quest.currentStage + 1).participants.add(participant);
             }
             int cardToDiscard = participant.attack.deck.size();
-            for (int i = 0; i < cardToDiscard; i++) {
+            for (int j = 0; j < cardToDiscard; j++) {
                 Card attack = participant.attack.deck.removeFirst();
                 adventureDiscardDeck.add(attack);
             }
 
         }
-        quest.currentStage++;
-        output.print("Players continuing the quest: " + quest.stages.get(quest.currentStage).participants);
+
+        if (quest.numStages - 1 == quest.currentStage) {
+
+            output.print("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants);
+        } else {
+            quest.currentStage++;
+            output.print("Players continuing the quest: " + quest.stages.get(quest.currentStage).participants);
+        }
 
 
     }
+
 
 }
