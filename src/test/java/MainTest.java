@@ -723,7 +723,7 @@ class MainTest {
     }
 
     @Test
-    @DisplayName("Game resolves attacks against the current stage")
+    @DisplayName("Game handles the completion of a quest and updates shields")
     void RESP_16_test_01() {
         StringWriter output = new StringWriter();
         Scanner mockScanner = mock(Scanner.class);
@@ -739,16 +739,46 @@ class MainTest {
 
 
         when(mockScanner.nextLine()).
-//                thenReturn("4", "4", "quit").thenReturn("4", "quit").thenReturn("3", "5", "quit");
                 thenReturn("4", "4", "quit").thenReturn("4", "3", "quit").thenReturn("3", "5", "quit");
         game.handleParticipantAttacks();
 
 
         game.resolveStage();
-//        System.out.println(output);
-        assertEquals(0, game.players.get(0).attack.size());
+        assertEquals(0, game.players.get(0).shields);
         assertEquals(0, game.players.get(2).attack.size());
         assertEquals(0, game.players.get(3).attack.size());
+    }
+
+    @Test
+    @DisplayName("Game discards cards used in attacks ")
+    void RESP_17_test_01() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
+        // Start game, decks are created, hands of the 4 players are set up with random cards
+        game.InitializeAdventureDeck();
+        game.InitializeEventDeck();
+        game.distributeCards();
+        rigInitialHands(game);
+
+        setUpQuest(mockScanner);
+
+
+        when(mockScanner.nextLine()).
+                thenReturn("4", "4", "quit").thenReturn("4", "quit").thenReturn("3", "5", "quit");
+        game.handleParticipantAttacks();
+
+
+        game.quest.stages.get(3).participants = game.quest.stages.get(game.quest.currentStage).participants;
+        game.quest.stages.get(3).value = 15;
+        game.quest.currentStage = 3;
+
+        game.resolveStage();
+
+        assertEquals(4, game.players.get(0).shields);
+        assertEquals(0, game.players.get(2).shields);
+        assertEquals(4, game.players.get(3).shields);
     }
 
     void rigInitialHands(Main game) {
@@ -761,10 +791,10 @@ class MainTest {
         int[] values4 = {5, 15, 15, 40, 5, 5, 10, 10, 10, 15, 20, 30};
         String[] types4 = {"F", "F", "F", "F", "D", "D", "S", "H", "H", "B", "L", "E"};
 
-        rigHand(game.players.get(0) , values1, types1);
-        rigHand(game.players.get(1) , values2, types2);
-        rigHand(game.players.get(2) , values3, types3);
-        rigHand(game.players.get(3) , values4, types4);
+        rigHand(game.players.get(0), values1, types1);
+        rigHand(game.players.get(1), values2, types2);
+        rigHand(game.players.get(2), values3, types3);
+        rigHand(game.players.get(3), values4, types4);
         game.players.get(0).hand.sort();
         game.players.get(1).hand.sort();
         game.players.get(2).hand.sort();
