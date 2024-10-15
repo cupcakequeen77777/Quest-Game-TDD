@@ -810,6 +810,37 @@ class MainTest {
 
     }
 
+    @Test
+    @DisplayName("If adventure deck or event deck runs out, reshuffle discard ")
+    void RESP_19_test_01() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
+        for (int i = 0; i < 100; i++) {
+            game.adventureDiscardDeck.add(game.drawAdventureCard());
+        }
+
+        for (int i = 0; i < 17; i++) {
+            game.eventDiscardDeck.add(game.drawEventCard());
+        }
+
+        assertEquals(0, game.adventureDeck.size());
+        assertEquals(100, game.adventureDiscardDeck.size());
+        assertEquals(0, game.eventDeck.size());
+        assertEquals(17, game.eventDiscardDeck.size());
+
+        game.adventureDiscardDeck.add(game.drawAdventureCard());
+        game.eventDiscardDeck.add(game.drawEventCard());
+
+        assertEquals(99, game.adventureDeck.size());
+        assertEquals(1, game.adventureDiscardDeck.size());
+        assertEquals(16, game.eventDeck.size());
+        assertEquals(1, game.eventDiscardDeck.size());
+
+
+    }
+
     void rigInitialHands(Main game) {
         int[] values1 = {5, 5, 15, 15, 5, 10, 10, 10, 10, 15, 15, 20};
         String[] types1 = {"F", "F", "F", "F", "D", "S", "S", "H", "H", "B", "B", "L"};
