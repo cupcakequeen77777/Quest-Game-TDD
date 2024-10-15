@@ -35,6 +35,7 @@ public class Player {
     // TODO: add card to deck
     public void addCard(Card card) {
         hand.add(card);
+        hand.sort();
     }
 
     public Card drawCard() {

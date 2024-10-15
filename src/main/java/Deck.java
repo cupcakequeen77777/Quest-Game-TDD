@@ -37,8 +37,16 @@ public class Deck {
         return deck.remove(index);
     }
 
+    public void removeAll() {
+        deck = new ArrayList<>();
+    }
+
     public void add(Card card) {
         deck.add(card);
+    }
+
+    public void add(Deck d) {
+        deck.addAll(d.getDeck());
     }
 
     public Card drawCard() {

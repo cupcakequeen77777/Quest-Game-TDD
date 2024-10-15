@@ -6,12 +6,14 @@ public class Quest {
     int numStages;
     boolean isCompleted;
     int currentStage;
+    Player sponsor;
 
     public Quest(int numStages) {
         this.numStages = numStages;
         stages = new ArrayList<>(numStages);
         isCompleted = false;
         currentStage = 0;
+        sponsor = null;
     }
 
     public void addStage(Stage stage) {
@@ -30,6 +32,14 @@ public class Quest {
             return false;
         }
         return !stages.get(stageIndex).isEmpty() && stages.get(stageIndex).getValue() > stages.get(stageIndex - 1).getValue();
+    }
+
+    public int countCardsUsed(){
+        int count = 0;
+        for(Stage stage : stages){
+            count += stage.weaponCards.size() + 1; // number of weapon cards and one foe card per stage
+        }
+        return count;
     }
 
     public String toString(){

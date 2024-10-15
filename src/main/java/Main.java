@@ -288,6 +288,7 @@ public class Main {
 
     public Quest sponsorSetsUpQuest(Player sponsor) {
         quest = new Quest(questCard.cardValue);
+        quest.sponsor = sponsor;
         for (int i = 0; i < quest.numStages; i++) {
             buildStage(sponsor, i);
         }
@@ -403,7 +404,7 @@ public class Main {
     }
 
     public void resolveStage() {
-        if(quest.numStages - 1 == quest.currentStage){
+        if (quest.numStages - 1 == quest.currentStage) {
             quest.stages.add(new Stage());
         }
 //        for (Player participant : quest.stages.get(quest.currentStage).participants) {
@@ -419,17 +420,23 @@ public class Main {
                 }
                 quest.stages.get(quest.currentStage + 1).participants.add(participant);
             }
-            int cardToDiscard = participant.attack.deck.size();
-            for (int j = 0; j < cardToDiscard; j++) {
-                Card attack = participant.attack.deck.removeFirst();
-                adventureDiscardDeck.add(attack);
-            }
-
+            adventureDiscardDeck.add(participant.attack);
+            participant.attack.removeAll();
         }
 
         if (quest.numStages - 1 == quest.currentStage) {
-
-            output.print("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants);
+            output.print("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants + "\n");
+            // draws the same number of cards + the number of stages, and then possibly trims their hand
+            for (int i = 0; i < quest.countCardsUsed() + quest.numStages; i++) {
+                quest.sponsor.addCard(adventureDeck.drawCard());
+            }
+            trimCards();
+            for (Stage stage : quest.stages) {
+                adventureDiscardDeck.add(stage.foeCard);
+                stage.foeCard = null;
+                adventureDiscardDeck.add(stage.weaponCards);
+                stage.weaponCards.removeAll();
+            }
         } else {
             quest.currentStage++;
             output.print("Players continuing the quest: " + quest.stages.get(quest.currentStage).participants);
